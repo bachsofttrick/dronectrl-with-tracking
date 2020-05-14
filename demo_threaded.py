@@ -44,6 +44,10 @@ def main():
     face_flag = True
     yolosort = False
     
+    # To be decided
+    temp_face = None
+    confirmed_number = 0
+    
     writeVideo_flag = False 
     
     # Open stream
@@ -61,7 +65,7 @@ def main():
         w = int(video_capture.get(3))
         h = int(video_capture.get(4))
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter('output.avi', fourcc, 15, (w, h))
+        out = cv2.VideoWriter('output.avi', fourcc, 24, (w, h))
         list_file = open('detection.txt', 'w')
         frame_index = -1 
 
@@ -82,13 +86,47 @@ def main():
             #pass
             face_bbox = dettect.recognize(frame)
             for i in range(len(face_bbox)):
+                face_name = face_bbox[i][4]
+                if face_name == 'bach':
+                    temp_face = face_bbox[i][0:4]
+                    
+                    # This calculates the vector from your ROI to the center of the screen
+                    vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
+                    center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
+                    vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
+                    vector_distance = vector_true-vector_target
+                    '''
+                    if vector_distance[0] < -safety_x:
+                        print("Yaw left.")
+                    elif vector_distance[0] > safety_x:
+                        print("Yaw right.")
+                    else:
+                        pass
+                    
+                    if vector_distance[1] > safety_y:
+                        print("Fly up.")
+                    elif vector_distance[1] < -safety_y:
+                        print("Fly down.")
+                    else:
+                        pass
+                    
+                    if vector_distance[2] > 10000:
+                        print("Push forward")
+                    elif vector_distance[2] < -10000:
+                        print("Pull back")
+                    else:
+                        pass
+                    '''
+                    print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                    cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
+                    cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
+                    
                 # Draw bounding box over face
                 cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
                 _text_x = face_bbox[i][0]
                 _text_y = face_bbox[i][3] + 20
 
                 # Write name on frame
-                face_name = face_bbox[i][4]
                 cv2.putText(frame, str(face_name), (_text_x, _text_y + 17*2), cv2.FONT_HERSHEY_COMPLEX_SMALL,
                             1, (255, 255, 255), thickness=1, lineType=2)
                 cv2.putText(frame, str(face_bbox[i][0:4]), (_text_x, _text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
@@ -96,6 +134,9 @@ def main():
                 cv2.putText(frame, str(round(face_bbox[i][5][0], 3)), (_text_x, _text_y + 17),
                             cv2.FONT_HERSHEY_COMPLEX_SMALL,
                             1, (255, 255, 255), thickness=1, lineType=2)
+                
+                # Draw the safety zone
+                cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
 
         # Body recognizer
         if yolosort:

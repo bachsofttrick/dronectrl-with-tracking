@@ -37,11 +37,15 @@ def main():
     tracker = Tracker(metric)
 
     # Facenet-based face recognizer
-    dettect = Recognizer('yolov2')
+    face_dettect = Recognizer('yolov2')
 
     # Flag to choose which model to run
     face_flag = True
     yolosort = False
+    
+    # To be decided
+    temp_face = None
+    confirmed_number = 0
     
     writeVideo_flag = False 
     
@@ -57,7 +61,7 @@ def main():
         w = int(video_capture.get(3))
         h = int(video_capture.get(4))
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter('output.avi', fourcc, 15, (w, h))
+        out = cv2.VideoWriter('output.avi', fourcc, 24, (w, h))
         list_file = open('detection.txt', 'w')
         frame_index = -1 
     
@@ -70,7 +74,6 @@ def main():
             break
         t1 = time.time()
         #frame = cv2.flip(frame, 1)
-        
         
         # Resize frame
         resize_to = (1280, 720)
@@ -87,16 +90,18 @@ def main():
         # Face recognizer
         if face_flag:
             #pass
-            face_bbox = dettect.recognize(frame)
+            face_bbox = face_dettect.recognize(frame)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
                 if face_name == 'bach':
+                    temp_face = face_bbox[i][0:4]
+                    
                     # This calculates the vector from your ROI to the center of the screen
-                    vector_true = np.array((resize_div_2[0], resize_div_2[1], 0))
+                    vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
                     center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                     vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
                     vector_distance = vector_true-vector_target
-                    
+                    '''
                     if vector_distance[0] < -safety_x:
                         print("Yaw left.")
                     elif vector_distance[0] > safety_x:
@@ -110,13 +115,12 @@ def main():
                         print("Fly down.")
                     else:
                         pass
-                    '''
-                    if vector_distance[2] > 0:
-                        #for_back_velocity = S + F
-                    elif vector_distance[2] < 0:
-                        #for_back_velocity = -S - F
+                    
+                    if vector_distance[2] > 10000:
+                        print("Push forward")
+                    elif vector_distance[2] < -10000:
+                        print("Pull back")
                     else:
-                        #for_back_velocity = 0
                         pass
                     '''
                     print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
@@ -138,7 +142,7 @@ def main():
                             1, (255, 255, 255), thickness=1, lineType=2)
                             
                 # Draw the safety zone
-                cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,0), 2)
+                cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
 
         # Face recognizer
         if yolosort:
@@ -163,14 +167,28 @@ def main():
                 if not track.is_confirmed() or track.time_since_update > 1:
                     continue 
                 bbox = track.to_tlbr()
+                # Only track 1 person (WIP)
+                if temp_face:
+                    number_of_true = 0
+                    number_of_true = (number_of_true + 1) if temp_face[0] > bbox[0] else number_of_true
+                    number_of_true = (number_of_true + 1) if temp_face[1] > bbox[1] else number_of_true
+                    number_of_true = (number_of_true + 1) if temp_face[2] < bbox[2] else number_of_true
+                    number_of_true = (number_of_true + 1) if temp_face[3] < bbox[3] else number_of_true
+                    if number_of_true == 4:
+                        confirmed_number = track.track_id
+                    else:
+                        print("Retry capture.")
+                    temp_face = None
+                if confirmed_number != track.track_id:
+                    continue
                 cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                 cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
-                
+            
             for det in detections:
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
-        
-        # Draw the target as a circle
+            
+        # Draw the center of frame as a circle
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
         # Scalable window
@@ -198,7 +216,6 @@ def main():
             face_flag = not face_flag
             yolosort = not yolosort
         
-        sleep(0.1)
     # Exiting
     video_capture.release()
     if writeVideo_flag:
