@@ -1,0 +1,2 @@
+export PATH=/usr/local/cuda-10.0/bin:/home/bachleu/.local/bin:/home/bachleu/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+export LD_LIBRARY_PATH=/usr/local/cuda-10.0/lib64/
