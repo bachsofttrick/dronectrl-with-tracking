@@ -43,6 +43,9 @@ def main():
     face_flag = True
     yolosort = False
     
+    # Flag to override autopilot
+    auto_engaged = False
+    
     # To be decided
     temp_face = None
     confirmed_number = 0
@@ -101,28 +104,29 @@ def main():
                     center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                     vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
                     vector_distance = vector_true-vector_target
-                    '''
-                    if vector_distance[0] < -safety_x:
-                        print("Yaw left.")
-                    elif vector_distance[0] > safety_x:
-                        print("Yaw right.")
-                    else:
-                        pass
                     
-                    if vector_distance[1] > safety_y:
-                        print("Fly up.")
-                    elif vector_distance[1] < -safety_y:
-                        print("Fly down.")
-                    else:
-                        pass
+                    if auto_engaged:
+                        if vector_distance[0] < -safety_x:
+                            print("Yaw left.")
+                        elif vector_distance[0] > safety_x:
+                            print("Yaw right.")
+                        else:
+                            pass
+                        
+                        if vector_distance[1] > safety_y:
+                            print("Fly up.")
+                        elif vector_distance[1] < -safety_y:
+                            print("Fly down.")
+                        else:
+                            pass
+                        
+                        if vector_distance[2] > 10000:
+                            print("Push forward")
+                        elif vector_distance[2] < -10000:
+                            print("Pull back")
+                        else:
+                            pass
                     
-                    if vector_distance[2] > 10000:
-                        print("Push forward")
-                    elif vector_distance[2] < -10000:
-                        print("Pull back")
-                    else:
-                        pass
-                    '''
                     print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                     cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                     cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
@@ -168,6 +172,7 @@ def main():
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
+                '''
                 if temp_face:
                     number_of_true = 0
                     number_of_true = (number_of_true + 1) if temp_face[0] > bbox[0] else number_of_true
@@ -181,6 +186,7 @@ def main():
                     temp_face = None
                 if confirmed_number != track.track_id:
                     continue
+                '''
                 cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                 cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
             
@@ -215,6 +221,8 @@ def main():
         if k == ord('t'):
             face_flag = not face_flag
             yolosort = not yolosort
+        if k == ord('o'):
+            auto_engaged = not auto_engaged
         
     # Exiting
     video_capture.release()
