@@ -58,10 +58,16 @@ def main():
     video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
     #video_capture = VideoGet('0').start()
     
-    # Enter drone
+    # Enter drone and control speed
     do_you_have_drone = True
+    velocity = 20
+    velocity2 = 40
     if do_you_have_drone:
         dm107s = Drone().start()
+    
+    # Enter safety zone coordinate
+    safety_x = 100
+    safety_y = 100
     
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
@@ -82,11 +88,12 @@ def main():
         #frame = cv2.flip(frame, 1)
         
         # Resize frame
-        frame = cv2.resize(frame, (1280, 720))
+        resize_to = (1280, 720)
+        resize_div_2 = (int(resize_to[0]/2), int(resize_to[1]/2))
+        frame = cv2.resize(frame, resize_to)
 
         # Face recognizer
         if face_flag:
-            #pass
             face_bbox = dettect.recognize(frame)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
@@ -98,30 +105,43 @@ def main():
                     center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                     vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
                     vector_distance = vector_true-vector_target
-                    '''
+                    
                     if auto_engaged:
-						if vector_distance[0] < -safety_x:
-							print("Yaw left.")
-						elif vector_distance[0] > safety_x:
-							print("Yaw right.")
-						else:
-							pass
-						
-						if vector_distance[1] > safety_y:
-							print("Fly up.")
-						elif vector_distance[1] < -safety_y:
-							print("Fly down.")
-						else:
-							pass
-						
-						if vector_distance[2] > 10000:
-							print("Push forward")
-						elif vector_distance[2] < -10000:
-							print("Pull back")
-						else:
-							pass
-                    '''
-                    print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        if vector_distance[0] < -safety_x:
+                            print("Yaw left.")
+                            dm107s.yaw = 128 + velocity
+                        elif vector_distance[0] > safety_x:
+                            print("Yaw right.")
+                            dm107s.yaw = 128 - velocity
+                        else:
+                            dm107s.yaw = 128
+                            #pass
+                        
+                        if vector_distance[1] > safety_y:
+                            print("Fly up.")
+                            #dm107s.throttle = 128 + velocity/2
+                        elif vector_distance[1] < -safety_y:
+                            print("Fly down.")
+                            #dm107s.throttle = 128 - velocity/2
+                        else:
+                            #dm107s.throttle = 128
+                            #pass
+                        
+                        if vector_distance[2] > 10000:
+                            print("Push forward")
+                            dm107s.pitch = 128 + velocity - 5
+                        elif vector_distance[2] < -1000:
+                            print("Pull back")
+                            dm107s.pitch = 128 - velocity
+                        else:
+                            dm107s.pitch = 128
+                            #pass
+                    
+                    #print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                    if auto_engaged:
+                        print_out = "AUTOPILOT " + str(int(vector_distance[2]))
+                    else:
+                        print_out = "MANUAL " + str(int(vector_distance[2]))
                     cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                     cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
                     
@@ -197,7 +217,6 @@ def main():
             face_flag = not face_flag
             yolosort = not yolosort
         if do_you_have_drone:
-            velocity = 30
             # Control drone
             # Override autopilot
             if k == ord('o'):
@@ -207,41 +226,41 @@ def main():
             if k == ord('t'):
                 dm107s.takeoff()
 
-			if auto_engaged:
-				# Throttle
-				if k == ord('w'):
-					#dm107s.throttle_up()
-					dm107s.incremt(0,0,velocity,0)
-				elif k == ord('s'):
-					#dm107s.throttle_dwn()
-					dm107s.incremt(0,0,-velocity,0)
+            if not auto_engaged:
+                # Throttle
+                if k == ord('w'):
+                    #dm107s.throttle_up()
+                    dm107s.incremt(0,0,velocity2,0)
+                elif k == ord('s'):
+                    #dm107s.throttle_dwn()
+                    dm107s.incremt(0,0,-velocity2,0)
 
-				# Yaw
-				if k == ord('a'):
-					#dm107s.yaw_left()
-					dm107s.incremt(0,0,0,velocity)
-				elif k == ord('d'):
-					#dm107s.yaw_right()
-					dm107s.incremt(0,0,0,-velocity)
+                # Yaw
+                if k == ord('a'):
+                    #dm107s.yaw_left()
+                    dm107s.incremt(0,0,0,velocity2)
+                elif k == ord('d'):
+                    #dm107s.yaw_right()
+                    dm107s.incremt(0,0,0,-velocity2)
 
-				# Pitch
-				if k == ord('i'):
-					#dm107s.pitch_fwd()
-					dm107s.incremt(0,velocity,0,0)
-				elif k == ord('k'):
-					#dm107s.pitch_bwd()
-					dm107s.incremt(0,-velocity,0,0)
+                # Pitch
+                if k == ord('i'):
+                    #dm107s.pitch_fwd()
+                    dm107s.incremt(0,velocity2,0,0)
+                elif k == ord('k'):
+                    #dm107s.pitch_bwd()
+                    dm107s.incremt(0,-velocity2,0,0)
 
-				# Roll
-				if k == ord('j'):
-					#dm107s.roll_left()
-					dm107s.incremt(-velocity,0,0,0)
-				elif k == ord('l'):
-					#dm107s.roll_right()
-					dm107s.incremt(velocity,0,0,0)
-				
-				if k == ord('f'):
-					dm107s.incremt(0,0,0,0)
+                # Roll
+                if k == ord('j'):
+                    #dm107s.roll_left()
+                    dm107s.incremt(-velocity2,0,0,0)
+                elif k == ord('l'):
+                    #dm107s.roll_right()
+                    dm107s.incremt(velocity2,0,0,0)
+                
+                if k == ord('f'):
+                    dm107s.incremt(0,0,0,0)
 
             # STOP NOW
             if k == ord('e'):

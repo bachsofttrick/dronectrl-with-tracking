@@ -148,6 +148,7 @@ class Drone():
 		self.throttle = 128
 		self.yaw = 128
 		self.commands = 2
+		self.onoff = 1
 		self._takeoff_flag = False
 	
 	# Calibrate gyroscope

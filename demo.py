@@ -92,7 +92,6 @@ def main():
         
         # Face recognizer
         if face_flag:
-            #pass
             face_bbox = face_dettect.recognize(frame)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
@@ -122,7 +121,7 @@ def main():
                         
                         if vector_distance[2] > 10000:
                             print("Push forward")
-                        elif vector_distance[2] < -10000:
+                        elif vector_distance[2] < -1000:
                             print("Pull back")
                         else:
                             pass
