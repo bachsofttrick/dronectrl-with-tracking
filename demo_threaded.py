@@ -125,7 +125,7 @@ def main():
                             #dm107s.throttle = 128 - velocity/2
                         else:
                             #dm107s.throttle = 128
-                            #pass
+                            pass
                         
                         if vector_distance[2] > 10000:
                             print("Push forward")
