@@ -18,9 +18,9 @@ from deep_sort.detection import Detection as ddet
 warnings.filterwarnings('ignore')
 
 # Custom import lib
-from face_recog_lib import Recognizer
-from VideoGet import VideoGet
-from dronectrl import Drone
+from customlibs.face_recog_lib import Recognizer
+from customlibs.VideoGet import VideoGet
+from customlibs.dronectrl import Drone
 
 def main():
     # Open YOLO

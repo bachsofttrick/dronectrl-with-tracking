@@ -18,7 +18,7 @@ from deep_sort.detection import Detection as ddet
 warnings.filterwarnings('ignore')
 
 # Custom import lib
-from face_recog_lib import Recognizer
+from customlibs.face_recog_lib import Recognizer
 from time import sleep
 
 def main():
@@ -37,7 +37,7 @@ def main():
     tracker = Tracker(metric)
 
     # Facenet-based face recognizer
-    face_dettect = Recognizer('yolov2')
+    face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
     face_flag = True
