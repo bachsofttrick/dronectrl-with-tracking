@@ -171,7 +171,7 @@ def main():
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
-                '''
+                
                 if temp_face:
                     number_of_true = 0
                     number_of_true = (number_of_true + 1) if temp_face[0] > bbox[0] else number_of_true
@@ -185,7 +185,7 @@ def main():
                     temp_face = None
                 if confirmed_number != track.track_id:
                     continue
-                '''
+                
                 cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                 cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
             
