@@ -7,8 +7,7 @@ class Resnetdnn:
         configFile = "Models/opencv_face_detector.pbtxt"
         self.model_rnet = cv2.dnn.readNetFromTensorflow(modelFile, configFile)
 
-    def detect(self, frame):
-        conf_threshold = 0.5
+    def detect(self, frame, conf_threshold):
         frameWidth = frame.shape[1]
         frameHeight = frame.shape[0]
         blob = cv2.dnn.blobFromImage(frame, 1.0, (300, 300), [104, 117, 123], False, False)

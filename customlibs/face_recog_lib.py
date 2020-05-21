@@ -1,9 +1,11 @@
 import tensorflow as tf
-from . import facenet
 import pickle
 import align.detect_face
 import numpy as np
 import cv2
+
+# Custom import lib
+from . import facenet
 from . import yolov2face
 from .resnet_lib import Resnetdnn
 
@@ -55,7 +57,7 @@ class Recognizer:
         elif self.option == 'yolov2':
             bounding_boxes = yolov2face.show_results(frame, self.model_yface)
         elif self.option == 'resnet10':
-            bounding_boxes = self.model_rnet.detect(frame)
+            bounding_boxes = self.model_rnet.detect(frame, 0.5)
         faces_found = len(bounding_boxes)
         bbox_result = []
         bach_count = 0
@@ -93,7 +95,7 @@ class Recognizer:
                         # 
                         bach_count = (bach_count + 1) if (best_name == 'bach' and best_class_probabilities > 0.7) else bach_count
                         #print(bach_count)
-                        #print("Name: {}, Probability: {}".format(best_name, best_class_probabilities))
+                        print("Name: {}, Probability: {}".format(best_name, best_class_probabilities))
 
                         # If probability > (a certain value) then add to resulting bbox
                         #if best_class_probabilities > 0.8:
