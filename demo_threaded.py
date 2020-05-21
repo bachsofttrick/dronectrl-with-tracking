@@ -38,7 +38,7 @@ def main():
     tracker = Tracker(metric)
 
     # Facenet-based face recognizer
-    dettect = Recognizer('yolov2')
+    face_dettect = Recognizer('yolov2')
 
     # Flag to choose which model to run
     face_flag = True
@@ -94,10 +94,11 @@ def main():
 
         # Face recognizer
         if face_flag:
-            face_bbox = dettect.recognize(frame)
+            person_to_follow = 'bach'
+            face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
-                if face_name == 'bach':
+                if face_name == person_to_follow:
                     temp_face = face_bbox[i][0:4]
                     
                     # This calculates the vector from your ROI to the center of the screen

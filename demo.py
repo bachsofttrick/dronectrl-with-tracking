@@ -92,10 +92,11 @@ def main():
         
         # Face recognizer
         if face_flag:
-            face_bbox = face_dettect.recognize(frame)
+            person_to_follow = 'bach'
+            face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
-                if face_name == 'bach':
+                if face_name == person_to_follow:
                     temp_face = face_bbox[i][0:4]
                     
                     # This calculates the vector from your ROI to the center of the screen
@@ -170,22 +171,6 @@ def main():
                 if not track.is_confirmed() or track.time_since_update > 1:
                     continue 
                 bbox = track.to_tlbr()
-                # Only track 1 person (WIP)
-                '''
-                if temp_face:
-                    number_of_true = 0
-                    number_of_true = (number_of_true + 1) if temp_face[0] > bbox[0] else number_of_true
-                    number_of_true = (number_of_true + 1) if temp_face[1] > bbox[1] else number_of_true
-                    number_of_true = (number_of_true + 1) if temp_face[2] < bbox[2] else number_of_true
-                    number_of_true = (number_of_true + 1) if temp_face[3] < bbox[3] else number_of_true
-                    if number_of_true == 4:
-                        confirmed_number = track.track_id
-                    else:
-                        print("Retry capture.")
-                    temp_face = None
-                if confirmed_number != track.track_id:
-                    continue
-                '''
                 cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                 cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
             

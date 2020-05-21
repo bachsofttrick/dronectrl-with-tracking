@@ -50,7 +50,7 @@ class Recognizer:
         self.phase_train_placeholder = tf.get_default_graph().get_tensor_by_name("phase_train:0")
         self.embedding_size = self.embeddings.get_shape()[1]
 
-    def recognize(self, frame):
+    def recognize(self, frame, name_chosen):
         # Detect face, return bounding_boxes
         if self.option == 'mtcnn':
             bounding_boxes, _ = align.detect_face.detect_face(frame, self.MINSIZE, self.pnet, self.rnet, self.onet, self.THRESHOLD, self.FACTOR)
@@ -60,7 +60,7 @@ class Recognizer:
             bounding_boxes = self.model_rnet.detect(frame, 0.5)
         faces_found = len(bounding_boxes)
         bbox_result = []
-        bach_count = 0
+        name_chosen_count = 0
 
         try:
             if faces_found > 0:
@@ -93,15 +93,15 @@ class Recognizer:
                         best_name = self.class_names[best_class_indices[0]]
 
                         # 
-                        bach_count = (bach_count + 1) if (best_name == 'bach' and best_class_probabilities > 0.7) else bach_count
-                        #print(bach_count)
+                        name_chosen_count = (name_chosen_count + 1) if (best_name == name_chosen and best_class_probabilities > 0.7) else name_chosen_count
+                        #print(name_chosen_count)
                         print("Name: {}, Probability: {}".format(best_name, best_class_probabilities))
 
                         # If probability > (a certain value) then add to resulting bbox
                         #if best_class_probabilities > 0.8:
                         if best_class_probabilities > 0.7:
-                            if bach_count > 1 and best_name == 'bach':
-                                print('Lose 1 bach!')
+                            if name_chosen_count > 1 and best_name == name_chosen:
+                                print('Alert 2 same person!')
                                 pass
                             else:
                                 bbox_result.append([bb[i][0], bb[i][1], bb[i][2], bb[i][3], best_name, best_class_probabilities])
