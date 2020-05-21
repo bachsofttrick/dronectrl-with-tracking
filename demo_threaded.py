@@ -46,6 +46,8 @@ def main():
     
     # Flag to override autopilot
     auto_engaged = False
+    # This is for controlling altitude manually
+    auto_throttle = False
     
     # To be decided
     face_to_track = None
@@ -120,13 +122,16 @@ def main():
                         
                         if vector_distance[1] > safety_y:
                             print("Fly up.")
-                            #dm107s.throttle = 128 + velocity/2
+                            if auto_throttle:
+                                dm107s.throttle = 128 + velocity/2
                         elif vector_distance[1] < -safety_y:
                             print("Fly down.")
-                            #dm107s.throttle = 128 - velocity/2
+                            if auto_throttle:
+                                dm107s.throttle = 128 - velocity/2
                         else:
-                            #dm107s.throttle = 128
-                            pass
+                            if auto_throttle:
+                                dm107s.throttle = 128
+                            #pass
                         
                         if vector_distance[2] > 10000:
                             print("Push forward")
@@ -227,7 +232,17 @@ def main():
             if k == ord('t'):
                 dm107s.takeoff()
 
+            # Throttle
+            if not auto_throttle:
+                if k == ord('w'):
+                    #dm107s.throttle_up()
+                    dm107s.incremt(0,0,velocity2,0)
+                elif k == ord('s'):
+                    #dm107s.throttle_dwn()
+                    dm107s.incremt(0,0,-velocity2,0)
+            
             if not auto_engaged:
+                '''
                 # Throttle
                 if k == ord('w'):
                     #dm107s.throttle_up()
@@ -235,7 +250,8 @@ def main():
                 elif k == ord('s'):
                     #dm107s.throttle_dwn()
                     dm107s.incremt(0,0,-velocity2,0)
-
+                '''
+                    
                 # Yaw
                 if k == ord('a'):
                     #dm107s.yaw_left()
