@@ -57,7 +57,7 @@ class Recognizer:
         elif self.option == 'yolov2':
             bounding_boxes = yolov2face.show_results(frame, self.model_yface)
         elif self.option == 'resnet10':
-            bounding_boxes = self.model_rnet.detect(frame, 0.5)
+            bounding_boxes = self.model_rnet.detect(frame, 0.67)
         faces_found = len(bounding_boxes)
         bbox_result = []
         bach_count = 0
