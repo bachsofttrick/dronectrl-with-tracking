@@ -40,14 +40,15 @@ def main():
     face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
-    face_flag = True
-    yolosort = False
+    face_flag = False
+    yolosort = True
     
     # Flag to override autopilot
     auto_engaged = False
     
-    # To be decided
-    temp_face = None
+    # Transfer to person tracking
+    face_to_track = None
+    face_locked = False
     confirmed_number = 0
     
     writeVideo_flag = False 
@@ -91,13 +92,14 @@ def main():
         n = 0
         
         # Face recognizer
+        person_to_follow = 'bach'
         if face_flag:
-            person_to_follow = 'bach'
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
                 if face_name == person_to_follow:
-                    temp_face = face_bbox[i][0:4]
+                    # Transfer face to person tracking
+                    face_to_track = face_bbox[i][0:4]
                     
                     # This calculates the vector from your ROI to the center of the screen
                     vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
@@ -172,23 +174,29 @@ def main():
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
-                '''
-                if temp_face:
+                
+                if face_to_track:
                     number_of_true = 0
-                    number_of_true = (number_of_true + 1) if temp_face[0] > bbox[0] else number_of_true
-                    number_of_true = (number_of_true + 1) if temp_face[1] > bbox[1] else number_of_true
-                    number_of_true = (number_of_true + 1) if temp_face[2] < bbox[2] else number_of_true
-                    number_of_true = (number_of_true + 1) if temp_face[3] < bbox[3] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[0] > bbox[0] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[1] > bbox[1] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[2] < bbox[2] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[3] < bbox[3] else number_of_true
                     if number_of_true == 4:
+                        print("Captured.")
+                        face_locked = True
                         confirmed_number = track.track_id
                     else:
+                        face_locked = False
                         print("Retry capture.")
-                    temp_face = None
-                if confirmed_number != track.track_id:
-                    continue
-                '''
-                cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                    face_to_track = None
+                if face_locked:
+                    if confirmed_number == track.track_id:
+                        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                        cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        break
+                else:
+                    cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                    cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
             
             for det in detections:
                 bbox = det.to_tlbr()
@@ -221,6 +229,7 @@ def main():
         if k == ord('t'):
             face_flag = not face_flag
             yolosort = not yolosort
+            face_locked = False
         if k == ord('o'):
             auto_engaged = not auto_engaged
         

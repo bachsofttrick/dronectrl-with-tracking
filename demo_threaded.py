@@ -48,7 +48,7 @@ def main():
     auto_engaged = False
     
     # To be decided
-    temp_face = None
+    face_to_track = None
     confirmed_number = 0
     
     writeVideo_flag = False 
@@ -93,13 +93,13 @@ def main():
         frame = cv2.resize(frame, resize_to)
 
         # Face recognizer
+        person_to_follow = 'bach'
         if face_flag:
-            person_to_follow = 'bach'
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
                 if face_name == person_to_follow:
-                    temp_face = face_bbox[i][0:4]
+                    face_to_track = face_bbox[i][0:4]
                     
                     # This calculates the vector from your ROI to the center of the screen
                     vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
