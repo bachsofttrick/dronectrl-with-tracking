@@ -38,7 +38,7 @@ def main():
     tracker = Tracker(metric)
 
     # Facenet-based face recognizer
-    face_dettect = Recognizer('yolov2')
+    face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
     face_flag = True
@@ -62,8 +62,8 @@ def main():
     
     # Enter drone and control speed
     do_you_have_drone = True
-    velocity = 20
-    velocity2 = 40
+    velocity = 30
+    velocity2 = 100
     if do_you_have_drone:
         dm107s = Drone().start()
     
@@ -92,7 +92,7 @@ def main():
         # Resize frame
         resize_to = (1280, 720)
         resize_div_2 = (int(resize_to[0]/2), int(resize_to[1]/2))
-        frame = cv2.resize(frame, resize_to)
+        #frame = cv2.resize(frame, resize_to)
 
         # Face recognizer
         person_to_follow = 'bach'
@@ -131,7 +131,7 @@ def main():
                         else:
                             if auto_throttle:
                                 dm107s.throttle = 128
-                            #pass
+                            pass
                         
                         if vector_distance[2] > 10000:
                             print("Push forward")
