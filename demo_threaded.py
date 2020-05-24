@@ -249,7 +249,7 @@ def main():
                     dm107s.incremt(0,0,0,0)
             
             if not auto_engaged:
-                '''
+                
                 # Throttle
                 if k == ord('w'):
                     #dm107s.throttle_up()
@@ -257,7 +257,7 @@ def main():
                 elif k == ord('s'):
                     #dm107s.throttle_dwn()
                     dm107s.incremt(0,0,-velocity2,0)
-                '''
+                
                     
                 # Yaw
                 if k == ord('a'):
