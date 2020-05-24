@@ -148,6 +148,7 @@ def main():
                             else:
                                 dm107s.pitch = 128
                         
+                        # Print center of bounding box and vector calculations
                         #print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                         if auto_engaged:
                             print_out = "AUTOPILOT " + str(int(vector_distance[2]))
