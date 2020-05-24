@@ -93,6 +93,7 @@ def main():
         
         # Face recognizer
         person_to_follow = 'bach'
+        vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
@@ -102,7 +103,6 @@ def main():
                     face_to_track = face_bbox[i][0:4]
                     
                     # This calculates the vector from your ROI to the center of the screen
-                    vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
                     center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                     vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
                     vector_distance = vector_true-vector_target
@@ -129,6 +129,7 @@ def main():
                         else:
                             pass
                     
+                    # Print center of bounding box and vector calculations
                     print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                     cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                     cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
@@ -191,6 +192,15 @@ def main():
                     face_to_track = None
                 if face_locked:
                     if confirmed_number == track.track_id:
+                        # This calculates the vector from your ROI to the center of the screen
+                        center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
+                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
+                        vector_distance = vector_true-vector_target
+                        # Print center of bounding box and vector calculations
+                        print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
+                        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
+                        # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                         cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
                         break
