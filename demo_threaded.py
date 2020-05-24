@@ -96,6 +96,7 @@ def main():
 
         # Face recognizer
         person_to_follow = 'bach'
+        vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             # Prevent autopilot when there is no face detected
@@ -112,7 +113,6 @@ def main():
                         face_to_track = face_bbox[i][0:4]
                         
                         # This calculates the vector from your ROI to the center of the screen
-                        vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
                         center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                         vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
                         vector_distance = vector_true-vector_target
