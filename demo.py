@@ -51,8 +51,6 @@ def main():
     face_locked = False
     confirmed_number = 0
     
-    writeVideo_flag = False 
-    
     # Open stream
     video_capture = cv2.VideoCapture("demo2.mp4")
 
@@ -60,6 +58,7 @@ def main():
     safety_x = 100
     safety_y = 100
     
+    writeVideo_flag = False 
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
         w = 1280
