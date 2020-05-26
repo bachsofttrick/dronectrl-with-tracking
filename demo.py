@@ -62,11 +62,10 @@ def main():
     
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
-        w = int(video_capture.get(3))
-        h = int(video_capture.get(4))
+        w = 1280
+        h = 720
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         out = cv2.VideoWriter('output.avi', fourcc, 24, (w, h))
-        list_file = open('detection.txt', 'w')
         frame_index = -1 
     
     n = 0
@@ -223,11 +222,6 @@ def main():
             # save a frame
             out.write(frame)
             frame_index = frame_index + 1
-            list_file.write(str(frame_index)+' ')
-            if len(boxs) != 0:
-                for i in range(0,len(boxs)):
-                    list_file.write(str(boxs[i][0]) + ' '+str(boxs[i][1]) + ' '+str(boxs[i][2]) + ' '+str(boxs[i][3]) + ' ')
-            list_file.write('\n')
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
         print("fps= %f"%(fps))
@@ -247,7 +241,6 @@ def main():
     video_capture.release()
     if writeVideo_flag:
         out.release()
-        list_file.close()
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
