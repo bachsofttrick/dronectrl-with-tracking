@@ -258,7 +258,7 @@ def main():
         if k == ord('r'):
             face_flag = not face_flag
             yolosort = not yolosort
-            # Reset control to prevent moving when switch model
+            # Reset control to prevent moving when switching model
             dm107s.default()
         if do_you_have_drone:
             # Control drone
