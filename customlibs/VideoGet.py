@@ -32,12 +32,21 @@ class VideoGet:
 
     def _get(self):
         while not self._stopped:
+            '''
             if not self.grabbed:
                 self.stop()
             else:
                 (self.grabbed, self.frame) = self._stream.read()
                 if (self.src[0:20] == "rtsp://192.168.100.1"):
                     sleep(0.005)
+            '''
+            try:
+                (temp_grabbed, temp_frame) = self._stream.read()
+            except:
+                continue
+            (self.grabbed, self.frame) = (temp_grabbed, temp_frame)
+            if (self.src[0:20] == "rtsp://192.168.100.1"):
+                sleep(0.005)
     
     def update(self):
         return (self.grabbed, self.frame)

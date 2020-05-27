@@ -69,7 +69,7 @@ def main():
     safety_x = 100
     safety_y = 100
     
-    writeVideo_flag = False 
+    writeVideo_flag = True 
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
         w = 1280
