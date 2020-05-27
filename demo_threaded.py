@@ -49,8 +49,9 @@ def main():
     # This is for controlling altitude manually
     auto_throttle = False
     
-    # To be decided
+    # Transfer to person tracking
     face_to_track = None
+    face_locked = False
     confirmed_number = 0
         
     # Open stream
@@ -195,8 +196,44 @@ def main():
                 if not track.is_confirmed() or track.time_since_update > 1:
                     continue 
                 bbox = track.to_tlbr()
-                cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                # Only track 1 person (WIP)
+                
+                if face_to_track:
+                    number_of_true = 0
+                    number_of_true = (number_of_true + 1) if face_to_track[0] > bbox[0] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[1] > bbox[1] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[2] < bbox[2] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[3] < bbox[3] else number_of_true
+                    if number_of_true == 4:
+                        print("Captured.")
+                        face_locked = True
+                        confirmed_number = track.track_id
+                    else:
+                        face_locked = False
+                        print("Retry capture.")
+                    face_to_track = None
+                if face_locked:
+                    if confirmed_number == track.track_id:
+                        # This calculates the vector from your ROI to the center of the screen
+                        center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
+                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
+                        vector_distance = vector_true-vector_target
+                        # Print center of bounding box and vector calculations
+                        print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
+                        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
+                        # Draw selected bounding box
+                        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                        cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        break
+                else:
+                    # This calculates the vector from your ROI to the center of the screen
+                    center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
+                    vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
+                    vector_distance = vector_true-vector_target
+                    # Draw bounding box and calculate box area
+                    cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                    cv2.putText(frame, str(track.track_id) + "," + str(int(vector_distance[2]+25000)),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
                 
             for det in detections:
                 bbox = det.to_tlbr()
@@ -221,6 +258,8 @@ def main():
         if k == ord('r'):
             face_flag = not face_flag
             yolosort = not yolosort
+            # Reset control to prevent moving when switch model
+            dm107s.default()
         if do_you_have_drone:
             # Control drone
             # Override autopilot
@@ -243,7 +282,6 @@ def main():
                     dm107s.incremt(0,0,0,0)
             
             if not auto_engaged:
-                
                 # Throttle
                 if k == ord('w'):
                     #dm107s.throttle_up()
@@ -251,7 +289,6 @@ def main():
                 elif k == ord('s'):
                     #dm107s.throttle_dwn()
                     dm107s.incremt(0,0,-velocity2,0)
-                
                     
                 # Yaw
                 if k == ord('a'):
