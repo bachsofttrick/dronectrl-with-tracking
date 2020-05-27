@@ -84,7 +84,7 @@ def main():
 
         # skip frame to remain real-time
         Frameskip = False
-        if 9 != n and Frameskip:
+        if 3 != n and Frameskip:
             n+=1
             continue
         n = 0
@@ -203,11 +203,13 @@ def main():
                         cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
                         break
                 else:
+                    # This calculates the vector from your ROI to the center of the screen
                     center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
                     vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
                     vector_distance = vector_true-vector_target
+                    # Draw bounding box and calculate box area
                     cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                    cv2.putText(frame, str(track.track_id) + "," + str(int(vector_distance[2]+20000)),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                    cv2.putText(frame, str(track.track_id) + "," + str(int(vector_distance[2]+25000)),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
             
             for det in detections:
                 bbox = det.to_tlbr()

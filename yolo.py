@@ -110,7 +110,6 @@ class YOLO(object):
             if predicted_class != 'person' :
                 continue
             box = out_boxes[i]
-            print('person', out_scores[i])
            # score = out_scores[i]  
             x = int(box[1])  
             y = int(box[0])  
