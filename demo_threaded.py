@@ -239,6 +239,9 @@ def main():
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
         
+        # Draw the center of frame as a circle
+        middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
+        cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
         # Scalable window
         cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
         cv2.imshow('Camera', frame)
