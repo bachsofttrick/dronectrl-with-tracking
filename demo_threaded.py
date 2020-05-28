@@ -55,8 +55,8 @@ def main():
     confirmed_number = 0
         
     # Open stream
-    video_capture = VideoGet("http://192.168.43.99:8080/video").start()
-    #video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
+    #video_capture = VideoGet("http://192.168.43.99:8080/video").start()
+    video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
     #video_capture = VideoGet('0').start()
     
     # Enter drone and control speed
@@ -200,9 +200,9 @@ def main():
                 
                 if face_to_track:
                     number_of_true = 0
-                    number_of_true = (number_of_true + 1) if face_to_track[0] > bbox[0] else number_of_true
-                    number_of_true = (number_of_true + 1) if face_to_track[1] > bbox[1] else number_of_true
-                    number_of_true = (number_of_true + 1) if face_to_track[2] < bbox[2] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[0] >= bbox[0] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[1] >= bbox[1] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[2] <= bbox[2] else number_of_true
                     number_of_true = (number_of_true + 1) if face_to_track[3] < bbox[3] else number_of_true
                     if number_of_true == 4:
                         print("Captured.")
