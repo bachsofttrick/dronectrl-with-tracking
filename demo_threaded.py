@@ -55,8 +55,8 @@ def main():
     confirmed_number = 0
         
     # Open stream
-    #video_capture = VideoGet("http://192.168.4.106:8080/video").start()
-    video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
+    video_capture = VideoGet("http://192.168.43.99:8080/video").start()
+    #video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
     #video_capture = VideoGet('0').start()
     
     # Enter drone and control speed
@@ -119,10 +119,10 @@ def main():
                         if auto_engaged:
                             if vector_distance[0] < -safety_x:
                                 print("Yaw left.")
-                                dm107s.yaw = 128 + velocity
+                                dm107s.yaw = 128 + velocity -5
                             elif vector_distance[0] > safety_x:
                                 print("Yaw right.")
-                                dm107s.yaw = 128 - velocity
+                                dm107s.yaw = 128 - velocity -5
                             else:
                                 dm107s.yaw = 128
                             
@@ -140,7 +140,7 @@ def main():
                             
                             if vector_distance[2] > 10000:
                                 print("Push forward")
-                                dm107s.pitch = 128 + velocity - 5
+                                dm107s.pitch = 128 + velocity
                             elif vector_distance[2] < -1000:
                                 print("Pull back")
                                 dm107s.pitch = 128 - velocity
@@ -259,6 +259,7 @@ def main():
             face_flag = not face_flag
             yolosort = not yolosort
             # Reset control to prevent moving when switching model
+            auto_engaged = False
             dm107s.default()
         if do_you_have_drone:
             # Control drone
