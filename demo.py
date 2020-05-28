@@ -52,7 +52,7 @@ def main():
     confirmed_number = 0
     
     # Open stream
-    video_capture = cv2.VideoCapture("demo3.mp4")
+    video_capture = cv2.VideoCapture("demo2.mp4")
 
     # Enter safety zone coordinate
     safety_x = 100
