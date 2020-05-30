@@ -4,6 +4,7 @@
 from __future__ import division, print_function, absolute_import
 
 from timeit import time
+import os
 import warnings
 import cv2
 import numpy as np
@@ -19,7 +20,7 @@ warnings.filterwarnings('ignore')
 
 # Custom import lib
 from customlibs.face_recog_lib import Recognizer
-from time import sleep
+from time import sleep, strftime
 
 def main():
     # Open YOLO
@@ -63,8 +64,9 @@ def main():
     # Define the codec and create VideoWriter object
         w = 1280
         h = 720
+        localtime = strftime("m%md%d-%H%M%S")
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter('output.avi', fourcc, 24, (w, h))
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 24, (w, h))
         frame_index = -1 
     
     n = 0
