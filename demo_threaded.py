@@ -4,6 +4,7 @@
 from __future__ import division, print_function, absolute_import
 
 from timeit import time
+from time import 
 import warnings
 import cv2
 import numpy as np
@@ -76,7 +77,8 @@ def main():
         w = 1280
         h = 720
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter('output.avi', fourcc, 24, (w, h))
+        localtime = strftime("m%md%d-%H%M%S")
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 24, (w, h))
         frame_index = -1 
 
     fps = 0.0
