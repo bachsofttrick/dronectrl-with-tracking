@@ -4,6 +4,7 @@
 from __future__ import division, print_function, absolute_import
 
 from timeit import time
+from time import sleep, strftime
 import os
 import warnings
 import cv2
@@ -20,7 +21,6 @@ warnings.filterwarnings('ignore')
 
 # Custom import lib
 from customlibs.face_recog_lib import Recognizer
-from time import sleep, strftime
 
 def main():
     # Open YOLO
