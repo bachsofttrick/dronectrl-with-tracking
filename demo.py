@@ -41,8 +41,8 @@ def main():
     face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
-    face_flag = False
-    yolosort = True
+    face_flag = True
+    yolosort = False
     
     # Flag to override autopilot
     auto_engaged = False
@@ -178,9 +178,9 @@ def main():
                 
                 if face_to_track:
                     number_of_true = 0
-                    number_of_true = (number_of_true + 1) if face_to_track[0] > bbox[0] else number_of_true
-                    number_of_true = (number_of_true + 1) if face_to_track[1] > bbox[1] else number_of_true
-                    number_of_true = (number_of_true + 1) if face_to_track[2] < bbox[2] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[0] >= bbox[0] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[1] >= bbox[1] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[2] <= bbox[2] else number_of_true
                     number_of_true = (number_of_true + 1) if face_to_track[3] < bbox[3] else number_of_true
                     if number_of_true == 4:
                         print("Captured.")
