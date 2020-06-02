@@ -199,7 +199,7 @@ def main():
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
-                
+                vector_true[2] *= 3
                 if face_to_track:
                     number_of_true = 0
                     number_of_true = (number_of_true + 1) if face_to_track[0] >= bbox[0] else number_of_true
@@ -220,13 +220,42 @@ def main():
                         center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
                         vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
                         vector_distance = vector_true-vector_target
+                        
+                        if auto_engaged:
+                            if vector_distance[0] < -safety_x*2:
+                                print("Yaw left.")
+                            elif vector_distance[0] > safety_x*2:
+                                print("Yaw right.")
+                            else:
+                                pass
+                            
+                            if vector_distance[1] > safety_y*2:
+                                print("Fly up.")
+                            elif vector_distance[1] < -safety_y*2:
+                                print("Fly down.")
+                            else:
+                                pass
+                            
+                            if vector_distance[2] > 50000:
+                                print("Push forward")
+                            elif vector_distance[2] < -50000:
+                                print("Pull back")
+                            else:
+                                pass
+                        
                         # Print center of bounding box and vector calculations
-                        print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        #print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        if auto_engaged:
+                            print_out = "AUTOPILOT " + str(int(vector_distance[2]))
+                        else:
+                            print_out = "MANUAL " + str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
                         cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                         cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        # Draw the safety zone
+                        cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                         break
                 else:
                     # This calculates the vector from your ROI to the center of the screen
