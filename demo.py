@@ -71,9 +71,12 @@ def main():
     
     n = 0
     fps = 0.0
+    fno = 0
+    bno = 0
 
     while True:
         ret, frame = video_capture.read()  
+        fno += 1
         if ret != True:
             break
         t1 = time.time()
@@ -99,6 +102,7 @@ def main():
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
                 if face_name == person_to_follow:
+                    bno += 1
                     # Transfer face to person tracking
                     face_to_track = face_bbox[i][0:4]
                     
@@ -231,6 +235,7 @@ def main():
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
         print("fps= %f"%(fps))
+        print("frame= %d, bach= %d" % (fno, bno))
         
         # Keypress action
         k = cv2.waitKey(1) & 0xFF
