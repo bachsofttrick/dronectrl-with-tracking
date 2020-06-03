@@ -101,6 +101,15 @@ def main():
         resize_div_2 = (int(resize_to[0]/2), int(resize_to[1]/2))
         #frame = cv2.resize(frame, resize_to)
 
+        # Show control on the right corner of frame
+        control_disp = "" 
+        
+        # Show autopilot status
+        if auto_engaged:
+            print_out = "AUTOPILOT "
+        else:
+            print_out = "MANUAL "
+        
         # Face recognizer
         person_to_follow = 'bach'
         vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
@@ -127,19 +136,23 @@ def main():
                         if auto_engaged:
                             if vector_distance[0] < -safety_x:
                                 print("Yaw left.")
+                                control_disp += "y<- "
                                 dm107s.yaw = 128 + velocity -5
                             elif vector_distance[0] > safety_x:
                                 print("Yaw right.")
+                                control_disp += "y-> "
                                 dm107s.yaw = 128 - velocity -5
                             else:
                                 dm107s.yaw = 128
                             
                             if vector_distance[1] > safety_y:
                                 print("Fly up.")
+                                control_disp += "t^ "
                                 if auto_throttle:
                                     dm107s.throttle = 128 + velocity/2
                             elif vector_distance[1] < -safety_y:
                                 print("Fly down.")
+                                control_disp += "tV "
                                 if auto_throttle:
                                     dm107s.throttle = 128 - velocity/2
                             else:
@@ -148,21 +161,19 @@ def main():
                             
                             if vector_distance[2] > 15000:
                                 print("Push forward")
+                                control_disp += "p^ "
                                 dm107s.pitch = 128 + velocity
                             elif vector_distance[2] < 8000:
                                 print("Pull back")
+                                control_disp += "pV "
                                 dm107s.pitch = 128 - velocity
                             else:
                                 dm107s.pitch = 128
                         
                         # Print center of bounding box and vector calculations
                         #print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
-                        if auto_engaged:
-                            print_out = "AUTOPILOT " + str(int(vector_distance[2]))
-                        else:
-                            print_out = "MANUAL " + str(int(vector_distance[2]))
+                        print_out += str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
-                        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (255,0,0),2)
                         
                     # Draw bounding box over face
                     cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -276,12 +287,10 @@ def main():
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
         
-        # Draw the center of frame as a circle
+        # Draw the center of frame as a circle and drone control
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
-        # Scalable window
-        cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
-        cv2.imshow('Camera', frame)
+        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (255,0,0),2)
         
         if writeVideo_flag:
             # save a frame
@@ -298,6 +307,7 @@ def main():
         if k == ord('r'):
             face_flag = not face_flag
             yolosort = not yolosort
+            face_locked = False
             # Reset control to prevent moving when switching model
             auto_engaged = False
             dm107s.default()
@@ -315,9 +325,11 @@ def main():
             if not auto_throttle:
                 if k == ord('w'):
                     #dm107s.throttle_up()
+                    control_disp += "t^ "
                     dm107s.incremt(0,0,velocity2,0)
                 elif k == ord('s'):
                     #dm107s.throttle_dwn()
+                    control_disp += "tV "
                     dm107s.incremt(0,0,-velocity2,0)
                 if k == ord('f'):
                     dm107s.incremt(0,0,0,0)
@@ -334,25 +346,31 @@ def main():
                 # Yaw
                 if k == ord('a'):
                     #dm107s.yaw_left()
+                    control_disp += "y<- "
                     dm107s.incremt(0,0,0,velocity2)
                 elif k == ord('d'):
                     #dm107s.yaw_right()
+                    control_disp += "y-> "
                     dm107s.incremt(0,0,0,-velocity2)
 
                 # Pitch
                 if k == ord('i'):
                     #dm107s.pitch_fwd()
+                    control_disp += "p^ "
                     dm107s.incremt(0,velocity2,0,0)
                 elif k == ord('k'):
                     #dm107s.pitch_bwd()
+                    control_disp += "pV "
                     dm107s.incremt(0,-velocity2,0,0)
 
                 # Roll
                 if k == ord('j'):
                     #dm107s.roll_left()
+                    control_disp += "r<- "
                     dm107s.incremt(-velocity2,0,0,0)
                 elif k == ord('l'):
                     #dm107s.roll_right()
+                    control_disp += "r-> "
                     dm107s.incremt(velocity2,0,0,0)
                 
                 if k == ord('f'):
@@ -360,12 +378,20 @@ def main():
 
             # STOP NOW
             if k == ord('e'):
+                control_disp = "STOP!"
                 dm107s.emergency_stop()
             
             # Calibrate gyro
             if k == ord('c'):
+                control_disp = "Calibrate..."
                 dm107s.calib_gyro()
-            
+        
+        # Draw drone control
+        cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
+        # Scalable window
+        cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
+        cv2.imshow('Camera', frame)
+    
     # Exiting
     video_capture.stop()
     if do_you_have_drone:
