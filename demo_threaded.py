@@ -4,7 +4,7 @@
 from __future__ import division, print_function, absolute_import
 
 from timeit import time
-from time import 
+from time import strftime 
 import warnings
 import cv2
 import numpy as np
@@ -82,11 +82,17 @@ def main():
         frame_index = -1 
 
     fps = 0.0
+    f_drop = 0
 
     while True:
         ret, frame = video_capture.update()
         if ret != True:
-            break
+            f_drop += 1
+            if f_drop > 10:
+                print("Dropped frames.")
+                break
+        else:
+            f_drop = 0
         t1 = time.time()        
         #frame = cv2.flip(frame, 1)
         
@@ -140,10 +146,10 @@ def main():
                                 if auto_throttle:
                                     dm107s.throttle = 128
                             
-                            if vector_distance[2] > 10000:
+                            if vector_distance[2] > 15000:
                                 print("Push forward")
                                 dm107s.pitch = 128 + velocity
-                            elif vector_distance[2] < -1000:
+                            elif vector_distance[2] < 8000:
                                 print("Pull back")
                                 dm107s.pitch = 128 - velocity
                             else:
@@ -156,7 +162,7 @@ def main():
                         else:
                             print_out = "MANUAL " + str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
-                        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
+                        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (255,0,0),2)
                         
                     # Draw bounding box over face
                     cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
