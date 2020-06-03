@@ -41,8 +41,8 @@ def main():
     face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
-    face_flag = False
-    yolosort = True
+    face_flag = True
+    yolosort = False
     
     # Flag to override autopilot
     auto_engaged = False
@@ -94,6 +94,9 @@ def main():
             continue
         n = 0
         
+        # Show control on the right corner of frame
+        control_disp = ""        
+        
         # Face recognizer
         person_to_follow = 'bach'
         vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
@@ -113,22 +116,28 @@ def main():
                     
                     if auto_engaged:
                         if vector_distance[0] < -safety_x:
+                            control_disp += "y<- "
                             print("Yaw left.")
                         elif vector_distance[0] > safety_x:
+                            control_disp += "y-> "
                             print("Yaw right.")
                         else:
                             pass
                         
                         if vector_distance[1] > safety_y:
+                            control_disp += "t^ "
                             print("Fly up.")
                         elif vector_distance[1] < -safety_y:
+                            control_disp += "tV "
                             print("Fly down.")
                         else:
                             pass
                         
-                        if vector_distance[2] > 10000:
+                        if vector_distance[2] > 15000:
+                            control_disp += "p^ "
                             print("Push forward")
-                        elif vector_distance[2] < -1000:
+                        elif vector_distance[2] < 8000:
+                            control_disp += "pV "
                             print("Pull back")
                         else:
                             pass
@@ -136,7 +145,7 @@ def main():
                     # Print center of bounding box and vector calculations
                     print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                     cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
-                    cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
+                    cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
                 
                 # Draw bounding box over face
                 cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -249,6 +258,7 @@ def main():
         # Draw the center of frame as a circle
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
+        cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
         # Scalable window
         cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
         cv2.imshow('Camera', frame)
