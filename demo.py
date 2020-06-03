@@ -97,6 +97,12 @@ def main():
         # Show control on the right corner of frame
         control_disp = ""        
         
+        # Show autopilot status
+        if auto_engaged:
+            print_out = "AUTOPILOT "
+        else:
+            print_out = "MANUAL "
+        
         # Face recognizer
         person_to_follow = 'bach'
         vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
@@ -116,36 +122,35 @@ def main():
                     
                     if auto_engaged:
                         if vector_distance[0] < -safety_x:
-                            control_disp += "y<- "
                             print("Yaw left.")
+                            control_disp += "y<- "
                         elif vector_distance[0] > safety_x:
-                            control_disp += "y-> "
                             print("Yaw right.")
+                            control_disp += "y-> "
                         else:
                             pass
                         
                         if vector_distance[1] > safety_y:
-                            control_disp += "t^ "
                             print("Fly up.")
+                            control_disp += "t^ "
                         elif vector_distance[1] < -safety_y:
-                            control_disp += "tV "
                             print("Fly down.")
+                            control_disp += "tV "
                         else:
                             pass
                         
                         if vector_distance[2] > 15000:
-                            control_disp += "p^ "
                             print("Push forward")
+                            control_disp += "p^ "
                         elif vector_distance[2] < 8000:
-                            control_disp += "pV "
                             print("Pull back")
+                            control_disp += "pV "
                         else:
                             pass
                     
                     # Print center of bounding box and vector calculations
-                    print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                    print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                     cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
-                    cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
                 
                 # Draw bounding box over face
                 cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -255,9 +260,10 @@ def main():
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
             
-        # Draw the center of frame as a circle
+        # Draw the center of frame as a circle and drone control
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
+        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
         cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
         # Scalable window
         cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
