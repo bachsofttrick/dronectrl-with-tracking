@@ -4,6 +4,8 @@
 from __future__ import division, print_function, absolute_import
 
 from timeit import time
+from time import sleep, strftime
+import os
 import warnings
 import cv2
 import numpy as np
@@ -19,7 +21,6 @@ warnings.filterwarnings('ignore')
 
 # Custom import lib
 from customlibs.face_recog_lib import Recognizer
-from time import sleep
 
 def main():
     # Open YOLO
@@ -46,11 +47,10 @@ def main():
     # Flag to override autopilot
     auto_engaged = False
     
-    # To be decided
+    # Transfer to person tracking
     face_to_track = None
+    face_locked = False
     confirmed_number = 0
-    
-    writeVideo_flag = False 
     
     # Open stream
     video_capture = cv2.VideoCapture("demo2.mp4")
@@ -59,20 +59,24 @@ def main():
     safety_x = 100
     safety_y = 100
     
+    writeVideo_flag = False 
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
-        w = int(video_capture.get(3))
-        h = int(video_capture.get(4))
+        w = 1280
+        h = 720
+        localtime = strftime("m%md%d-%H%M%S")
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
-        out = cv2.VideoWriter('output.avi', fourcc, 24, (w, h))
-        list_file = open('detection.txt', 'w')
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 24, (w, h))
         frame_index = -1 
     
     n = 0
     fps = 0.0
+    fno = 0
+    bno = 0
 
     while True:
         ret, frame = video_capture.read()  
+        fno += 1
         if ret != True:
             break
         t1 = time.time()
@@ -85,22 +89,33 @@ def main():
 
         # skip frame to remain real-time
         Frameskip = False
-        if 9 != n and Frameskip:
+        if 3 != n and Frameskip:
             n+=1
             continue
         n = 0
         
+        # Show control on the right corner of frame
+        control_disp = ""        
+        
+        # Show autopilot status
+        if auto_engaged:
+            print_out = "AUTOPILOT "
+        else:
+            print_out = "MANUAL "
+        
         # Face recognizer
         person_to_follow = 'bach'
+        vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
                 if face_name == person_to_follow:
+                    bno += 1
+                    # Transfer face to person tracking
                     face_to_track = face_bbox[i][0:4]
                     
                     # This calculates the vector from your ROI to the center of the screen
-                    vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
                     center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                     vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
                     vector_distance = vector_true-vector_target
@@ -108,28 +123,34 @@ def main():
                     if auto_engaged:
                         if vector_distance[0] < -safety_x:
                             print("Yaw left.")
+                            control_disp += "y<- "
                         elif vector_distance[0] > safety_x:
                             print("Yaw right.")
+                            control_disp += "y-> "
                         else:
                             pass
                         
                         if vector_distance[1] > safety_y:
                             print("Fly up.")
+                            control_disp += "t^ "
                         elif vector_distance[1] < -safety_y:
                             print("Fly down.")
+                            control_disp += "tV "
                         else:
                             pass
                         
-                        if vector_distance[2] > 10000:
+                        if vector_distance[2] > 15000:
                             print("Push forward")
-                        elif vector_distance[2] < -1000:
+                            control_disp += "p^ "
+                        elif vector_distance[2] < 8000:
                             print("Pull back")
+                            control_disp += "pV "
                         else:
                             pass
                     
-                    print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                    # Print center of bounding box and vector calculations
+                    print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                     cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
-                    cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
                 
                 # Draw bounding box over face
                 cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -171,16 +192,79 @@ def main():
                 if not track.is_confirmed() or track.time_since_update > 1:
                     continue 
                 bbox = track.to_tlbr()
-                cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                cv2.putText(frame, str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                # Only track 1 person (WIP)
+                vector_true[2] *= 3
+                if face_to_track:
+                    number_of_true = 0
+                    number_of_true = (number_of_true + 1) if face_to_track[0] >= bbox[0] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[1] >= bbox[1] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[2] <= bbox[2] else number_of_true
+                    number_of_true = (number_of_true + 1) if face_to_track[3] < bbox[3] else number_of_true
+                    if number_of_true == 4:
+                        print("Captured.")
+                        face_locked = True
+                        confirmed_number = track.track_id
+                    else:
+                        face_locked = False
+                        print("Retry capture.")
+                    face_to_track = None
+                if face_locked:
+                    if confirmed_number == track.track_id:
+                        # This calculates the vector from your ROI to the center of the screen
+                        center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
+                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
+                        vector_distance = vector_true-vector_target
+                        
+                        if auto_engaged:
+                            if vector_distance[0] < -safety_x*2:
+                                print("Yaw left.")
+                            elif vector_distance[0] > safety_x*2:
+                                print("Yaw right.")
+                            else:
+                                pass
+                            
+                            if vector_distance[1] > safety_y*2:
+                                print("Fly up.")
+                            elif vector_distance[1] < -safety_y*2:
+                                print("Fly down.")
+                            else:
+                                pass
+                            
+                            if vector_distance[2] > 50000:
+                                print("Push forward")
+                            elif vector_distance[2] < -50000:
+                                print("Pull back")
+                            else:
+                                pass
+                        
+                        # Print center of bounding box and vector calculations
+                        print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
+                        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
+                        # Draw selected bounding box
+                        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                        cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        # Draw the safety zone
+                        cv2.rectangle(frame, (resize_div_2[0] - safety_x*2, resize_div_2[1] - safety_y*2), (resize_div_2[0] + safety_x*2, resize_div_2[1] + safety_y*2), (0,255,255), 2)
+                        break
+                else:
+                    # This calculates the vector from your ROI to the center of the screen
+                    center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
+                    vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
+                    vector_distance = vector_true-vector_target
+                    # Draw bounding box and calculate box area
+                    cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                    cv2.putText(frame, str(track.track_id) + "," + str(int(vector_distance[2])),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
             
             for det in detections:
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
             
-        # Draw the center of frame as a circle
+        # Draw the center of frame as a circle and drone control
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
+        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
+        cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
         # Scalable window
         cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
         cv2.imshow('Camera', frame)
@@ -189,14 +273,10 @@ def main():
             # save a frame
             out.write(frame)
             frame_index = frame_index + 1
-            list_file.write(str(frame_index)+' ')
-            if len(boxs) != 0:
-                for i in range(0,len(boxs)):
-                    list_file.write(str(boxs[i][0]) + ' '+str(boxs[i][1]) + ' '+str(boxs[i][2]) + ' '+str(boxs[i][3]) + ' ')
-            list_file.write('\n')
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
         print("fps= %f"%(fps))
+        #print("frame= %d, bach= %d" % (fno, bno))
         
         # Keypress action
         k = cv2.waitKey(1) & 0xFF
@@ -205,6 +285,7 @@ def main():
         if k == ord('t'):
             face_flag = not face_flag
             yolosort = not yolosort
+            face_locked = False
         if k == ord('o'):
             auto_engaged = not auto_engaged
         
@@ -212,7 +293,6 @@ def main():
     video_capture.release()
     if writeVideo_flag:
         out.release()
-        list_file.close()
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
