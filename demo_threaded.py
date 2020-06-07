@@ -174,6 +174,8 @@ def main():
                         #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                         print_out += str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
+                        # Draw the safety zone
+                        cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                         
                     # Draw bounding box over face
                     cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -189,9 +191,6 @@ def main():
                                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                 1, (255, 255, 255), thickness=1, lineType=2)
                     
-                    # Draw the safety zone
-                    cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
-
         # Body recognizer
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb

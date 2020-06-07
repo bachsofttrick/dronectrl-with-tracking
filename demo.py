@@ -4,7 +4,7 @@
 from __future__ import division, print_function, absolute_import
 
 from timeit import time
-from time import sleep, strftime
+from time import strftime
 import os
 import warnings
 import cv2
@@ -51,6 +51,8 @@ def main():
     face_to_track = None
     face_locked = False
     confirmed_number = 0
+    # String to convert to ID that needs tracking
+    confirmed_string = ""
     
     # Open stream
     video_capture = cv2.VideoCapture("demo2.mp4")
@@ -149,8 +151,11 @@ def main():
                             pass
                     
                     # Print center of bounding box and vector calculations
-                    print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                    #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                    print_out += str(int(vector_distance[2]))
                     cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
+                    # Draw the safety zone
+                    cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                 
                 # Draw bounding box over face
                 cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -166,9 +171,6 @@ def main():
                             cv2.FONT_HERSHEY_COMPLEX_SMALL,
                             1, (255, 255, 255), thickness=1, lineType=2)
                             
-                # Draw the safety zone
-                cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
-
         # Face recognizer
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb
@@ -238,7 +240,8 @@ def main():
                                 pass
                         
                         # Print center of bounding box and vector calculations
-                        print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        print_out += str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
@@ -258,7 +261,8 @@ def main():
             for det in detections:
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
-            
+        
+        print_out += confirmed_string
         # Draw the center of frame as a circle and autopilot status
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
@@ -283,6 +287,12 @@ def main():
             face_locked = False
         if k == ord('o'):
             auto_engaged = not auto_engaged
+        # Number key for entering ID to track
+        num_string = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        if k >= 48 and k <= 57:
+            confirmed_string += num_string[k - 48]
+        if k == ord('c'):
+            confirmed_string = ""
         
         # Draw drone control
         cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
