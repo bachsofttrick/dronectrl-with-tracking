@@ -238,9 +238,8 @@ def main():
                                 pass
                         
                         # Print center of bounding box and vector calculations
-                        print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
-                        cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,255,0),2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                         cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
@@ -264,10 +263,6 @@ def main():
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
         cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
-        cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
-        # Scalable window
-        cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
-        cv2.imshow('Camera', frame)
         
         if writeVideo_flag:
             # save a frame
@@ -288,6 +283,12 @@ def main():
             face_locked = False
         if k == ord('o'):
             auto_engaged = not auto_engaged
+        
+        # Draw drone control
+        cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
+        # Scalable window
+        cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
+        cv2.imshow('Camera', frame)
         
     # Exiting
     video_capture.release()

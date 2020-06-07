@@ -171,7 +171,7 @@ def main():
                                 dm107s.pitch = 128
                         
                         # Print center of bounding box and vector calculations
-                        #print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                         print_out += str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                         
@@ -261,11 +261,8 @@ def main():
                                 pass
                         
                         # Print center of bounding box and vector calculations
-                        #print_out = str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
-                        if auto_engaged:
-                            print_out = "AUTOPILOT " + str(int(vector_distance[2]))
-                        else:
-                            print_out = "MANUAL " + str(int(vector_distance[2]))
+                        #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                        print_out += str(int(vector_distance[2]))
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
