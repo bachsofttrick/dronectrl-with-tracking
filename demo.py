@@ -106,6 +106,12 @@ def main():
         else:
             print_out = "MANUAL "
         
+        # Show model in use (PRS = person)
+        if face_flag:
+            model_in_use = "FACE"
+        elif yolosort:
+            model_in_use = "PRS"
+        
         # Face recognizer
         vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
         if face_flag:
@@ -300,6 +306,8 @@ def main():
             confirmed_string = ""
             face_locked = False
         
+        # Show model in use on frame
+        cv2.putText(frame, model_in_use,(0, 20),0, 0.8, (255,0,0),2)
         # Draw drone control
         cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
         # Scalable window
