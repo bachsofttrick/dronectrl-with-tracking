@@ -38,6 +38,7 @@ def main():
     tracker = Tracker(metric)
 
     # Facenet-based face recognizer
+    person_to_follow = 'bach'
     face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
@@ -106,7 +107,6 @@ def main():
             print_out = "MANUAL "
         
         # Face recognizer
-        person_to_follow = 'bach'
         vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
@@ -242,10 +242,10 @@ def main():
                         # Print center of bounding box and vector calculations
                         #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
                         print_out += str(int(vector_distance[2]))
-                        cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
+                        cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,255,255), 2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                        cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        cv2.putText(frame, "Tracked-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
                         # Draw the safety zone
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x*2, resize_div_2[1] - safety_y*2), (resize_div_2[0] + safety_x*2, resize_div_2[1] + safety_y*2), (0,255,255), 2)
                         break
@@ -289,10 +289,16 @@ def main():
             auto_engaged = not auto_engaged
         # Number key for entering ID to track
         num_string = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-        if k >= 48 and k <= 57:
-            confirmed_string += num_string[k - 48]
+        if not face_locked and yolosort:
+            if k >= 48 and k <= 57:
+                confirmed_string += num_string[k - 48]
+            if k == 13:
+                confirmed_number = int(confirmed_string)
+                face_locked = True
+                confirmed_string = ""
         if k == ord('c'):
             confirmed_string = ""
+            face_locked = False
         
         # Draw drone control
         cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)

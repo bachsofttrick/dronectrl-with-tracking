@@ -39,6 +39,7 @@ def main():
     tracker = Tracker(metric)
 
     # Facenet-based face recognizer
+    person_to_follow = 'bach'
     face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
@@ -111,7 +112,6 @@ def main():
             print_out = "MANUAL "
         
         # Face recognizer
-        person_to_follow = 'bach'
         vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
