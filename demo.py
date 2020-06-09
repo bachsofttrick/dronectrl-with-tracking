@@ -113,7 +113,7 @@ def main():
             model_in_use = "PERSON"
         
         # Face recognizer
-        vector_true = np.array((resize_div_2[0], resize_div_2[1], 17000))
+        vector_true = np.array((resize_div_2[0], resize_div_2[1]))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
@@ -126,8 +126,9 @@ def main():
                         
                         # This calculates the vector from your ROI to the center of the screen
                         center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
-                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
+                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                         vector_distance = vector_true-vector_target
+                        face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
                         
                         if vector_distance[0] < -safety_x:
                             print("Yaw left.")
@@ -147,18 +148,17 @@ def main():
                         else:
                             pass
                         
-                        if vector_distance[2] > 7000:
+                        if face_area < 9000:
                             print("Push forward")
                             control_disp += "p^ "
-                        elif vector_distance[2] < 0:
+                        elif face_area > 16000:
                             print("Pull back")
                             control_disp += "pV "
                         else:
                             pass
                     
                         # Print center of bounding box and vector calculations
-                        #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
-                        print_out += str(int(vector_distance[2]))
+                        print_out += str(face_area)
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                         # Draw the safety zone
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
@@ -201,7 +201,6 @@ def main():
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
-                vector_true[2] *= 3
                 if face_to_track:
                     number_of_true = 0
                     number_of_true = (number_of_true + 1) if face_to_track[0] >= bbox[0] else number_of_true
@@ -220,8 +219,9 @@ def main():
                     if confirmed_number == track.track_id:
                         # This calculates the vector from your ROI to the center of the screen
                         center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
-                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
+                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                         vector_distance = vector_true-vector_target
+                        person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
                         
                         if auto_engaged:
                             if vector_distance[0] < -safety_x*2:
@@ -238,16 +238,15 @@ def main():
                             else:
                                 pass
                             
-                            if vector_distance[2] > 50000:
+                            if person_area < 50000:
                                 print("Push forward")
-                            elif vector_distance[2] < -50000:
+                            elif person_area > 100000:
                                 print("Pull back")
                             else:
                                 pass
                         
                         # Print center of bounding box and vector calculations
-                        #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
-                        print_out += str(int(vector_distance[2]))
+                        print_out += str(person_area)
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,255,255), 2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
@@ -258,11 +257,12 @@ def main():
                 else:
                     # This calculates the vector from your ROI to the center of the screen
                     center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
-                    vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])))
+                    vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                     vector_distance = vector_true-vector_target
+                    person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
                     # Draw bounding box and calculate box area
                     cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                    cv2.putText(frame, str(track.track_id) + "," + str(int(vector_distance[2])),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                    cv2.putText(frame, str(track.track_id) + "," + str(person_area),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
             
             for det in detections:
                 bbox = det.to_tlbr()
