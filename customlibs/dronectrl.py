@@ -17,11 +17,14 @@ class Drone():
 		self.onoff = 1
 		# Prevent multiple takeoff button presses
 		self._takeoff_flag = False
+        # Prevent multiple calibrate button presses
+        self._calibrate_flag = False
 		# Connect to UDP port
 		self.sess = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
 		self.sess.connect(('192.168.100.1', 19798))
 		# Initialize timer value
 		self._takeoff_timer = 0
+        self._calibrate_timer = 0
 		# Flag to stop thread
 		self._stopped = False
 	
@@ -140,6 +143,10 @@ class Drone():
 		if (self._takeoff_flag == True and (time() - self._takeoff_timer >= 1)):
 			self.commands = 0
 			self._takeoff_flag = False
+        if (self._calibrate_flag == True and (time() - self._calibrate_timer >= 3)):
+			self.commands = 0
+            self.onoff = 1
+			self._calibrate_flag = False
 	
 	# Stop IMMEDIATELY
 	def emergency_stop(self):
@@ -153,9 +160,11 @@ class Drone():
 	
 	# Calibrate gyroscope
 	def calib_gyro(self):
-		self.roll = 128
-		self.pitch = 128
-		self.throttle = 128
-		self.yaw = 128
-		self.commands = 4
-		self.onoff = 0
+        if self._calibrate_flag == False:
+            self.roll = 128
+            self.pitch = 128
+            self.throttle = 128
+            self.yaw = 128
+            self.commands = 4
+            self.onoff = 0
+            self._calibrate_timer = time()

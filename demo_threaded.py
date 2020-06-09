@@ -111,6 +111,12 @@ def main():
         else:
             print_out = "MANUAL "
         
+        # Show model in use
+        if face_flag:
+            model_in_use = "FACE"
+        elif yolosort:
+            model_in_use = "PERSON"
+        
         # Face recognizer
         vector_true = np.array((resize_div_2[0], resize_div_2[1], 16000))
         if face_flag:
@@ -373,6 +379,8 @@ def main():
                 control_disp = "Calibrate..."
                 dm107s.calib_gyro()
         
+        # Show model in use on frame
+        cv2.putText(frame, model_in_use,(0, 20),0, 0.8, (255,0,0),2)
         # Draw drone control
         cv2.putText(frame, control_disp,((frame.shape[1] - 150), (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
         # Scalable window

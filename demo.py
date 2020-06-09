@@ -106,7 +106,7 @@ def main():
         else:
             print_out = "MANUAL "
         
-        # Show model in use (PRS = person)
+        # Show model in use
         if face_flag:
             model_in_use = "FACE"
         elif yolosort:
