@@ -49,7 +49,7 @@ def main():
     # Flag to override autopilot
     auto_engaged = False
     # This is for controlling altitude manually
-    auto_throttle = False
+    auto_throttle = True
     
     # Transfer to person tracking
     face_to_track = None
@@ -79,7 +79,7 @@ def main():
         h = 720
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         localtime = strftime("m%md%d-%H%M%S")
-        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 24, (w, h))
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 15, (w, h))
         frame_index = -1 
 
     fps = 0.0
@@ -112,7 +112,7 @@ def main():
             print_out = "MANUAL "
         
         # Face recognizer
-        vector_true = np.array((resize_div_2[0], resize_div_2[1], 25000))
+        vector_true = np.array((resize_div_2[0], resize_div_2[1], 16000))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             # Prevent autopilot when there is no face detected
@@ -125,23 +125,23 @@ def main():
             else:
                 for i in range(len(face_bbox)):
                     face_name = face_bbox[i][4]
-                    if face_name == person_to_follow:
-                        face_to_track = face_bbox[i][0:4]
-                        
-                        # This calculates the vector from your ROI to the center of the screen
-                        center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
-                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
-                        vector_distance = vector_true-vector_target
-                        
-                        if auto_engaged:
+                    if auto_engaged:
+                        if face_name == person_to_follow:
+                            face_to_track = face_bbox[i][0:4]
+                            
+                            # This calculates the vector from your ROI to the center of the screen
+                            center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
+                            vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1]), int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])))
+                            vector_distance = vector_true-vector_target
+                            
                             if vector_distance[0] < -safety_x:
                                 print("Yaw left.")
                                 control_disp += "y<- "
-                                dm107s.yaw = 128 + velocity -5
+                                dm107s.yaw = 128 + velocity
                             elif vector_distance[0] > safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
-                                dm107s.yaw = 128 - velocity -5
+                                dm107s.yaw = 128 - velocity
                             else:
                                 dm107s.yaw = 128
                             
@@ -149,33 +149,33 @@ def main():
                                 print("Fly up.")
                                 control_disp += "t^ "
                                 if auto_throttle:
-                                    dm107s.throttle = 128 + velocity/2
+                                    dm107s.throttle = 128 + 15
                             elif vector_distance[1] < -safety_y:
                                 print("Fly down.")
                                 control_disp += "tV "
                                 if auto_throttle:
-                                    dm107s.throttle = 128 - velocity/2
+                                    dm107s.throttle = 128 - 70
                             else:
                                 if auto_throttle:
                                     dm107s.throttle = 128
                             
-                            if vector_distance[2] > 15000:
+                            if vector_distance[2] > 7000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 dm107s.pitch = 128 + velocity
-                            elif vector_distance[2] < 8000:
+                            elif vector_distance[2] < 0:
                                 print("Pull back")
                                 control_disp += "pV "
-                                dm107s.pitch = 128 - velocity
+                                dm107s.pitch = 128 - velocity - 5
                             else:
                                 dm107s.pitch = 128
                         
-                        # Print center of bounding box and vector calculations
-                        #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
-                        print_out += str(int(vector_distance[2]))
-                        cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
-                        # Draw the safety zone
-                        cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
+                            # Print center of bounding box and vector calculations
+                            #print_out += str(int(vector_distance[0])) + " " + str(int(vector_distance[1])) + " " + str(int(vector_distance[2]))
+                            print_out += str(int(vector_distance[2]))
+                            cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
+                            # Draw the safety zone
+                            cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                         
                     # Draw bounding box over face
                     cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -287,14 +287,6 @@ def main():
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
         cv2.putText(frame, print_out,(0, (frame.shape[0] - 10)),0, 0.8, (0,0,255),2)
         
-        if writeVideo_flag:
-            # save a frame
-            out.write(frame)
-            frame_index = frame_index + 1
-            
-        fps  = ( fps + (1./(time.time()-t1)) ) / 2
-        print("fps= %f"%(fps))
-        
         # Keypress action
         k = cv2.waitKey(1) & 0xFF
         if k == ord('q'):
@@ -386,7 +378,15 @@ def main():
         # Scalable window
         cv2.namedWindow('Camera', cv2.WINDOW_NORMAL)
         cv2.imshow('Camera', frame)
-    
+        
+        if writeVideo_flag:
+            # save a frame
+            out.write(frame)
+            frame_index = frame_index + 1
+            
+        fps  = ( fps + (1./(time.time()-t1)) ) / 2
+        print("fps= %f"%(fps))
+        
     # Exiting
     video_capture.stop()
     if do_you_have_drone:
