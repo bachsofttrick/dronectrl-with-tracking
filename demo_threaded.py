@@ -235,14 +235,13 @@ def main():
                         face_locked = False
                         print("Retry capture.")
                     face_to_track = None
+                # This calculates the vector from your ROI to the center of the screen
+                center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
+                vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
+                vector_distance = vector_true-vector_target
+                person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
                 if face_locked:
                     if confirmed_number == track.track_id:
-                        # This calculates the vector from your ROI to the center of the screen
-                        center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
-                        vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
-                        vector_distance = vector_true-vector_target
-                        person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
-                        
                         if auto_engaged:
                             if vector_distance[0] < -safety_x*2:
                                 print("Yaw left.")
@@ -275,11 +274,6 @@ def main():
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                         break
                 else:
-                    # This calculates the vector from your ROI to the center of the screen
-                    center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
-                    vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
-                    vector_distance = vector_true-vector_target
-                    person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
                     # Draw bounding box and calculate box area
                     cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                     cv2.putText(frame, str(track.track_id) + "," + str(person_area),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
