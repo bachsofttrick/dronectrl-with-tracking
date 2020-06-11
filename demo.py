@@ -223,28 +223,35 @@ def main():
                 center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
                 vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                 vector_distance = vector_true-vector_target
-                person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
+                #person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
+                person_area = (int(bbox[2] - bbox[0]))**2
                 if face_locked:
                     if confirmed_number == track.track_id:
                         if auto_engaged:
                             if vector_distance[0] < -safety_x_person:
                                 print("Yaw left.")
+                                control_disp += "y<- "
                             elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
+                                control_disp += "y-> "
                             else:
                                 pass
                             
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
+                                control_disp += "t^ "
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
+                                control_disp += "tV "
                             else:
                                 pass
                             
                             if person_area < 50000:
                                 print("Push forward")
+                                control_disp += "p^ "
                             elif person_area > 100000:
                                 print("Pull back")
+                                control_disp += "pV "
                             else:
                                 pass
                         

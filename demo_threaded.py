@@ -249,22 +249,28 @@ def main():
                         if auto_engaged:
                             if vector_distance[0] < -safety_x_person:
                                 print("Yaw left.")
+                                control_disp += "y<- "
                             elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
+                                control_disp += "y-> "
                             else:
                                 pass
                             
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
+                                control_disp += "t^ "
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
+                                control_disp += "tV "
                             else:
                                 pass
                             
                             if person_area < 50000:
                                 print("Push forward")
+                                control_disp += "p^ "
                             elif person_area > 100000:
                                 print("Pull back")
+                                control_disp += "pV "
                             else:
                                 pass
                         
