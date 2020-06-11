@@ -125,12 +125,12 @@ def main():
                 # Calculate face area
                 face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
                 
-                if auto_engaged:
-                    if face_name == person_to_follow:
-                        bno += 1
-                        # Transfer face to person tracking
-                        person_to_track = face_bbox[i][0:4]
-                        
+                if face_name == person_to_follow:
+                    bno += 1
+                    # Transfer face to person tracking
+                    person_to_track = face_bbox[i][0:4]
+                    
+                    if auto_engaged:
                         # This calculates the vector from your ROI to the center of the screen
                         center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                         vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
@@ -226,9 +226,8 @@ def main():
                 person_area = (int(bbox[2] - bbox[0]))**2
                 
                 if face_locked:
-                    if auto_engaged:
-                        if confirmed_number == track.track_id:
-                        #if auto_engaged:
+                    if confirmed_number == track.track_id:
+                        if auto_engaged:
                             # This calculates the vector from your ROI to the center of the screen
                             center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
@@ -252,10 +251,10 @@ def main():
                             else:
                                 pass
                             
-                            if person_area < 50000:
+                            if person_area < 100000:
                                 print("Push forward")
                                 control_disp += "p^ "
-                            elif person_area > 100000:
+                            elif person_area > 200000:
                                 print("Pull back")
                                 control_disp += "pV "
                             else:
@@ -264,12 +263,12 @@ def main():
                             # Print center of bounding box and vector calculations
                             print_out += str(person_area)
                             cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,255,255), 2)
-                            # Draw selected bounding box
-                            cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                            cv2.putText(frame, "Tracked-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
-                            # Draw the safety zone
-                            cv2.rectangle(frame, (resize_div_2[0] - safety_x_person, resize_div_2[1] - safety_y_person), (resize_div_2[0] + safety_x_person, resize_div_2[1] + safety_y_person), (0,255,255), 2)
-                            break
+                        # Draw selected bounding box
+                        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                        cv2.putText(frame, "Tracked-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        # Draw the safety zone
+                        cv2.rectangle(frame, (resize_div_2[0] - safety_x_person, resize_div_2[1] - safety_y_person), (resize_div_2[0] + safety_x_person, resize_div_2[1] + safety_y_person), (0,255,255), 2)
+                        break
                 else:
                     # Draw bounding box and calculate box area
                     cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
@@ -300,7 +299,7 @@ def main():
         if not face_locked and yolosort:
             if k >= 48 and k <= 57:
                 confirmed_string += num_string[k - 48]
-            if k == 13:
+            if k == 13 and confirmed_string != '':
                 confirmed_number = int(confirmed_string)
                 face_locked = True
                 confirmed_string = ""
