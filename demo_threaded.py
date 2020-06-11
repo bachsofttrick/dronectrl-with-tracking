@@ -241,7 +241,7 @@ def main():
                     else:
                         face_locked = False
                         print("Retry capture.")
-                    person_to_track = None
+                person_to_track = None
                     
                 # Calculate person bounding box area
                 person_area = (int(bbox[2] - bbox[0]))**2
@@ -311,9 +311,9 @@ def main():
         if k == ord('r'):
             face_flag = not face_flag
             yolosort = not yolosort
-            face_locked = False
+            #face_locked = False
             # Reset control to prevent moving when switching model
-            auto_engaged = False
+            #auto_engaged = False
             dm107s.default()
         if do_you_have_drone:
             # Control drone

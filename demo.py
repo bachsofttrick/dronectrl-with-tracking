@@ -220,14 +220,15 @@ def main():
                     else:
                         face_locked = False
                         print("Retry capture.")
-                    person_to_track = None
+                person_to_track = None
                
                 # Calculate person bounding box area
                 person_area = (int(bbox[2] - bbox[0]))**2
                 
                 if face_locked:
-                    if confirmed_number == track.track_id:
-                        if auto_engaged:
+                    if auto_engaged:
+                        if confirmed_number == track.track_id:
+                        #if auto_engaged:
                             # This calculates the vector from your ROI to the center of the screen
                             center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
