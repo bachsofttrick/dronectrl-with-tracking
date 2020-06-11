@@ -69,8 +69,12 @@ def main():
         dm107s = Drone().start()
     
     # Enter safety zone coordinate
+    # For face tracking
     safety_x = 100
     safety_y = 100
+    # For person tracking
+    safety_x_person = 150
+    safety_y_person = 150
     
     writeVideo_flag = True 
     if writeVideo_flag:
@@ -243,16 +247,16 @@ def main():
                 if face_locked:
                     if confirmed_number == track.track_id:
                         if auto_engaged:
-                            if vector_distance[0] < -safety_x*2:
+                            if vector_distance[0] < -safety_x_person:
                                 print("Yaw left.")
-                            elif vector_distance[0] > safety_x*2:
+                            elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
                             else:
                                 pass
                             
-                            if vector_distance[1] > safety_y*2:
+                            if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
-                            elif vector_distance[1] < -safety_y*2:
+                            elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
                             else:
                                 pass
@@ -271,7 +275,7 @@ def main():
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
                         cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
                         # Draw the safety zone
-                        cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
+                        cv2.rectangle(frame, (resize_div_2[0] - safety_x_person, resize_div_2[1] - safety_y_person), (resize_div_2[0] + safety_x_person, resize_div_2[1] + safety_y_person), (0,255,255), 2)
                         break
                 else:
                     # Draw bounding box and calculate box area
