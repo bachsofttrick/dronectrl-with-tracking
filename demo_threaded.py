@@ -114,6 +114,9 @@ def main():
             print_out = "AUTOPILOT "
         else:
             print_out = "MANUAL "
+        # Display if controlling altitude automatically
+        if auto_throttle:
+            print_out += "ATh"
         
         # Show model in use
         if face_flag:
@@ -257,36 +260,48 @@ def main():
                             if vector_distance[0] < -safety_x_person:
                                 print("Yaw left.")
                                 control_disp += "y<- "
+                                #dm107s.yaw = 128 + velocity
                             elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
+                                #dm107s.yaw = 128 - velocity
                             else:
+                                #dm107s.yaw = 128
                                 pass
                             
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
                                 control_disp += "t^ "
+                                #if auto_throttle:
+                                #    dm107s.throttle = 128 + 15
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
                                 control_disp += "tV "
+                                #if auto_throttle:
+                                #    dm107s.throttle = 128 - 70
                             else:
+                                #if auto_throttle:
+                                #    dm107s.throttle = 128
                                 pass
                             
                             if person_area < 100000:
                                 print("Push forward")
                                 control_disp += "p^ "
+                                #dm107s.pitch = 128 + velocity
                             elif person_area > 200000:
                                 print("Pull back")
                                 control_disp += "pV "
+                                #dm107s.pitch = 128 - velocity - 5
                             else:
+                                #dm107s.pitch = 128
                                 pass
                         
                             # Print center of bounding box and vector calculations
                             print_out += str(person_area)
-                            cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
+                            cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,255,255), 2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                        cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        cv2.putText(frame, "Tracked-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
                         # Draw the safety zone
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x_person, resize_div_2[1] - safety_y_person), (resize_div_2[0] + safety_x_person, resize_div_2[1] + safety_y_person), (0,255,255), 2)
                         break
@@ -315,12 +330,29 @@ def main():
             # Reset control to prevent moving when switching model
             #auto_engaged = False
             dm107s.default()
+        # Number key for entering ID to track
+        num_string = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+        if not face_locked and yolosort:
+            if k >= 48 and k <= 57:
+                confirmed_string += num_string[k - 48]
+            if k == 13 and confirmed_string != '':
+                confirmed_number = int(confirmed_string)
+                face_locked = True
+                confirmed_string = ""
+        if k == ord('c'):
+            confirmed_string = ""
+            face_locked = False
+        
         if do_you_have_drone:
             # Control drone
             # Override autopilot
             if k == ord('o'):
                 auto_engaged = not auto_engaged
-			
+                dm107s.default()
+            # Override auto throttle control
+            if k == ord('u'):
+                auto_throttle = not auto_throttle
+            
             # Takeoff and landing
             if k == ord('t'):
                 dm107s.takeoff()
