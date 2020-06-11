@@ -281,15 +281,15 @@ def main():
                             else:
                                 pass
                         
-                        # Print center of bounding box and vector calculations
-                        print_out += str(person_area)
-                        cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
-                        # Draw selected bounding box
-                        cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                        cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
-                        # Draw the safety zone
-                        cv2.rectangle(frame, (resize_div_2[0] - safety_x_person, resize_div_2[1] - safety_y_person), (resize_div_2[0] + safety_x_person, resize_div_2[1] + safety_y_person), (0,255,255), 2)
-                        break
+                            # Print center of bounding box and vector calculations
+                            print_out += str(person_area)
+                            cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,0,255), 2)
+                            # Draw selected bounding box
+                            cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
+                            cv2.putText(frame, person_to_follow + "-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                            # Draw the safety zone
+                            cv2.rectangle(frame, (resize_div_2[0] - safety_x_person, resize_div_2[1] - safety_y_person), (resize_div_2[0] + safety_x_person, resize_div_2[1] + safety_y_person), (0,255,255), 2)
+                            break
                 else:
                     # Draw bounding box and calculate box area
                     cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
