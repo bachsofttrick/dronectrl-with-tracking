@@ -49,7 +49,7 @@ def main():
     auto_engaged = False
     
     # Transfer to person tracking
-    face_to_track = None
+    person_to_track = None
     face_locked = False
     confirmed_number = 0
     # String to convert to ID that needs tracking
@@ -122,17 +122,19 @@ def main():
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
+                # Calculate face area
+                face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
+                
                 if auto_engaged:
                     if face_name == person_to_follow:
                         bno += 1
                         # Transfer face to person tracking
-                        face_to_track = face_bbox[i][0:4]
+                        person_to_track = face_bbox[i][0:4]
                         
                         # This calculates the vector from your ROI to the center of the screen
                         center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                         vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                         vector_distance = vector_true-vector_target
-                        face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
                         
                         if vector_distance[0] < -safety_x:
                             print("Yaw left.")
@@ -205,12 +207,12 @@ def main():
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
-                if face_to_track:
+                if person_to_track:
                     number_of_true = 0
-                    number_of_true = (number_of_true + 1) if face_to_track[0] >= bbox[0] else number_of_true
-                    number_of_true = (number_of_true + 1) if face_to_track[1] >= bbox[1] else number_of_true
-                    number_of_true = (number_of_true + 1) if face_to_track[2] <= bbox[2] else number_of_true
-                    number_of_true = (number_of_true + 1) if face_to_track[3] < bbox[3] else number_of_true
+                    number_of_true = (number_of_true + 1) if person_to_track[0] >= bbox[0] else number_of_true
+                    number_of_true = (number_of_true + 1) if person_to_track[1] >= bbox[1] else number_of_true
+                    number_of_true = (number_of_true + 1) if person_to_track[2] <= bbox[2] else number_of_true
+                    number_of_true = (number_of_true + 1) if person_to_track[3] < bbox[3] else number_of_true
                     if number_of_true == 4:
                         print("Captured.")
                         face_locked = True
@@ -218,16 +220,19 @@ def main():
                     else:
                         face_locked = False
                         print("Retry capture.")
-                    face_to_track = None
-                # This calculates the vector from your ROI to the center of the screen
-                center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
-                vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
-                vector_distance = vector_true-vector_target
-                #person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
+                    person_to_track = None
+               
+                # Calculate person bounding box area
                 person_area = (int(bbox[2] - bbox[0]))**2
+                
                 if face_locked:
                     if confirmed_number == track.track_id:
                         if auto_engaged:
+                            # This calculates the vector from your ROI to the center of the screen
+                            center_of_bound_box = np.array(((bbox[0] + bbox[2])/2, (bbox[1] + bbox[3])/2))
+                            vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
+                            vector_distance = vector_true-vector_target
+                            
                             if vector_distance[0] < -safety_x_person:
                                 print("Yaw left.")
                                 control_disp += "y<- "
