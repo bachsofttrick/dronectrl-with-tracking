@@ -5,6 +5,7 @@ from __future__ import division, print_function, absolute_import
 
 from timeit import time
 from time import strftime
+from math import sqrt
 import os
 import warnings
 import cv2
@@ -24,7 +25,7 @@ from customlibs.face_recog_lib import Recognizer
 
 def main():
     # Open YOLO
-    yolo = YOLO('full')
+    yolo = YOLO('tiny')
     
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -64,7 +65,7 @@ def main():
     safety_y = 100
     # For person tracking
     safety_x_person = 150
-    safety_y_person = 150
+    safety_y_person = 200
     
     writeVideo_flag = False 
     if writeVideo_flag:
@@ -223,7 +224,7 @@ def main():
                 person_to_track = None
                
                 # Calculate person bounding box area
-                person_area = (int(bbox[2] - bbox[0]))**2
+                person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
                 
                 if face_locked:
                     if confirmed_number == track.track_id:

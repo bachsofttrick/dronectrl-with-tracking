@@ -25,7 +25,7 @@ from customlibs.dronectrl import Drone
 
 def main():
     # Open YOLO
-    yolo = YOLO('full')
+    yolo = YOLO('tiny')
 
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -43,18 +43,20 @@ def main():
     face_dettect = Recognizer('resnet10')
 
     # Flag to choose which model to run
-    face_flag = True
-    yolosort = False
+    face_flag = False
+    yolosort = True
     
     # Flag to override autopilot
     auto_engaged = False
     # This is for controlling altitude manually
-    auto_throttle = True
+    auto_throttle = False
     
     # Transfer to person tracking
     person_to_track = None
     face_locked = False
     confirmed_number = 0
+    # String to convert to ID that needs tracking
+    confirmed_string = ""
         
     # Open stream
     #video_capture = VideoGet("http://192.168.43.99:8080/video").start()
@@ -64,7 +66,7 @@ def main():
     # Enter drone and control speed
     do_you_have_drone = True
     velocity = 30
-    velocity2 = 100
+    velocity2 = 120
     if do_you_have_drone:
         dm107s = Drone().start()
     
@@ -74,7 +76,7 @@ def main():
     safety_y = 100
     # For person tracking
     safety_x_person = 150
-    safety_y_person = 150
+    safety_y_person = 200
     
     writeVideo_flag = True 
     if writeVideo_flag:
@@ -83,7 +85,7 @@ def main():
         h = 720
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         localtime = strftime("m%md%d-%H%M%S")
-        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 15, (w, h))
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 25, (w, h))
         frame_index = -1 
 
     fps = 0.0
@@ -247,7 +249,7 @@ def main():
                 person_to_track = None
                     
                 # Calculate person bounding box area
-                person_area = (int(bbox[2] - bbox[0]))**2
+                person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
                 
                 if face_locked:
                     if confirmed_number == track.track_id:
@@ -260,40 +262,40 @@ def main():
                             if vector_distance[0] < -safety_x_person:
                                 print("Yaw left.")
                                 control_disp += "y<- "
-                                #dm107s.yaw = 128 + velocity
+                                dm107s.yaw = 128 + velocity
                             elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
-                                #dm107s.yaw = 128 - velocity
+                                dm107s.yaw = 128 - velocity
                             else:
-                                #dm107s.yaw = 128
+                                dm107s.yaw = 128
                                 pass
                             
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
                                 control_disp += "t^ "
-                                #if auto_throttle:
-                                #    dm107s.throttle = 128 + 15
+                                if auto_throttle:
+                                    dm107s.throttle = 128 + 15
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
                                 control_disp += "tV "
-                                #if auto_throttle:
-                                #    dm107s.throttle = 128 - 70
+                                if auto_throttle:
+                                    dm107s.throttle = 128 - 70
                             else:
-                                #if auto_throttle:
-                                #    dm107s.throttle = 128
+                                if auto_throttle:
+                                    dm107s.throttle = 128
                                 pass
                             
-                            if person_area < 100000:
+                            if person_area < 60000:
                                 print("Push forward")
                                 control_disp += "p^ "
-                                #dm107s.pitch = 128 + velocity
-                            elif person_area > 200000:
+                                dm107s.pitch = 128 + 30 + 25
+                            elif person_area > 80000:
                                 print("Pull back")
                                 control_disp += "pV "
-                                #dm107s.pitch = 128 - velocity - 5
+                                dm107s.pitch = 128 - 30 - 10
                             else:
-                                #dm107s.pitch = 128
+                                dm107s.pitch = 128
                                 pass
                         
                             # Print center of bounding box and vector calculations
@@ -314,6 +316,7 @@ def main():
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
         
+        print_out += confirmed_string
         # Draw the center of frame as a circle and autopilot status
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
         cv2.circle(frame, middle_of_frame, 5, (255,128,0), 2)
@@ -418,7 +421,7 @@ def main():
                 dm107s.emergency_stop()
             
             # Calibrate gyro
-            if k == ord('c'):
+            if k == ord('v'):
                 control_disp = "Calibrate..."
                 dm107s.calib_gyro()
         
