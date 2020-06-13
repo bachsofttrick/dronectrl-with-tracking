@@ -5,7 +5,6 @@
 *.pb
 *.h5
 *.pkl
-*.txt
 *.rar
 *.pbtxt
 *.pyc

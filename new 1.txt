@@ -1,0 +1,41 @@
+BEGIN
+    lấy frame từ drone
+    tính tâm diểm (điểm giữa) của frame, tạo thành vector_1 và nhập diện tích mặt yêu cầu (an toàn), khung an toàn (safety zone)
+    kiểm tra face_flag (nhận diện khuôn mặt) hay yolosort (nhận diện người)
+    if face_flag:
+        frame được gửi vào thuật toán nhận dạng mặt
+        if số mặt > 0:
+            đi từng hộp giới hạn 
+            if chế độ tự lái == on:
+                tính tâm điểm (điểm giữa) của hộp giới hạn, tạo vector_2
+                lấy vector_1 - vector_2
+                if khoảng cách giữa x_1, x_2 xa hơn x_[an toàn]:
+                    if x_1 < x_2:
+                        drone quay sang trái
+                    else if x_1 > x_2:
+                        drone quay sang phải
+                else: đi sang so sánh kế theo
+                if khoảng cách giữa y_1, y_2 xa hơn y_[an toàn]:
+                    if y_1 < y_2:
+                        drone bay cao
+                    else if y_1 > y_2:
+                        drone xuống thấp
+                else: đi sang so sánh kế theo
+                if diện_tích_mặt < diện_tích_[an toàn]:
+                    drone tiến gần
+                else if diện_tích_mặt > diện_tích_[an toàn]
+                    drone lùi xa
+                else: pass
+            else if chế độ tự lái == off: pass
+            QUAY LẠI [đi từng hộp giới hạn]
+        else if số mặt == 0:
+            if chế độ tự lái == on:
+                giữ drone đứng yên
+            else: pass
+    else: chuyển sang nhận dạng người
+    
+    if yolosort:
+        frame được gửi vào thuật toán nhận dạng người, đi qua non-max suppression để giảm bớt hộp
+        hộp đưa vào deep_sort để xét id
+        if 
+END

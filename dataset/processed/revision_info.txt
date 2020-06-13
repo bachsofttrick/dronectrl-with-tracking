@@ -1,0 +1,7 @@
+arguments: align_dataset_mtcnn.py dataset/raw dataset/processed --image_size 160 --random_order --gpu_memory_fraction 0.6
+--------------------
+tensorflow version: 1.13.1
+--------------------
+git hash: git rev-parse HEAD: The system cannot find the file specified
+--------------------
+git diff HEAD: The system cannot find the file specified
