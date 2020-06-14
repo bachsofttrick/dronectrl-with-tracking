@@ -41,10 +41,14 @@ def main():
     # Facenet-based face recognizer
     person_to_follow = 'bach'
     face_dettect = Recognizer('resnet10')
+    # Count how many frames until we switch to person-tracking
+    person_found = False
+    pno = 0
+    skip_pno = 0
 
     # Flag to choose which model to run
-    face_flag = False
-    yolosort = True
+    face_flag = True
+    yolosort = False
     
     # Flag to override autopilot
     auto_engaged = False
@@ -130,6 +134,7 @@ def main():
         vector_true = np.array((resize_div_2[0], resize_div_2[1]))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
+            person_found = False
             # Prevent autopilot when there is no face detected
             if len(face_bbox) == 0:
                 if auto_engaged:
@@ -143,57 +148,28 @@ def main():
                     # Calculate face area
                     face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
                     
-                    if face_name == person_to_follow:
-                        # Transfer face to person tracking
-                        person_to_track = face_bbox[i][0:4]
+                    if auto_engaged:
+                        if face_name == person_to_follow:
+                            person_found = True
+                            pno += 1
                         
-                        if auto_engaged:
                             # This calculates the vector from your ROI to the center of the screen
                             center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                             vector_distance = vector_true-vector_target
-                            
-                            if vector_distance[0] < -safety_x:
-                                print("Yaw left.")
-                                control_disp += "y<- "
-                                dm107s.yaw = 128 + velocity
-                            elif vector_distance[0] > safety_x:
-                                print("Yaw right.")
-                                control_disp += "y-> "
-                                dm107s.yaw = 128 - velocity
-                            else:
-                                dm107s.yaw = 128
-                            
-                            if vector_distance[1] > safety_y:
-                                print("Fly up.")
-                                control_disp += "t^ "
-                                if auto_throttle:
-                                    dm107s.throttle = 128 + 15
-                            elif vector_distance[1] < -safety_y:
-                                print("Fly down.")
-                                control_disp += "tV "
-                                if auto_throttle:
-                                    dm107s.throttle = 128 - 70
-                            else:
-                                if auto_throttle:
-                                    dm107s.throttle = 128
-                            
-                            if face_area < 9000:
-                                print("Push forward")
-                                control_disp += "p^ "
-                                dm107s.pitch = 128 + velocity
-                            elif face_area > 16000:
-                                print("Pull back")
-                                control_disp += "pV "
-                                dm107s.pitch = 128 - velocity - 5
-                            else:
-                                dm107s.pitch = 128
-                        
                             # Print center of bounding box and vector calculations
                             print_out += str(face_area)
                             cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                             # Draw the safety zone
                             cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
+                            
+                            # Transfer face to person tracking
+                            if pno >= 30:
+                                person_to_track = face_bbox[i][0:4]
+                                face_flag = False
+                                yolosort = True
+                                pno = 0
+                                skip_pno = 0
                         
                     # Draw bounding box over face
                     cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -208,8 +184,17 @@ def main():
                     cv2.putText(frame, str(round(face_bbox[i][5][0], 3)), (_text_x, _text_y + 17),
                                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                 1, (255, 255, 255), thickness=1, lineType=2)
-                    
-        # Body recognizer
+            
+            # Count how many frames until tracked person is lost
+            if not person_found:
+                if pno > 0:
+                    if skip_pno >= 5:
+                        pno = 0
+                        skip_pno = 0
+                    else:
+                        skip_pno += 1
+            
+        # Person tracking
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb
             boxs = yolo.detect_image(image)
@@ -246,6 +231,8 @@ def main():
                     else:
                         face_locked = False
                         print("Retry capture.")
+                        face_flag = True
+                        yolosort = False
                 person_to_track = None
                     
                 # Calculate person bounding box area
@@ -330,7 +317,9 @@ def main():
         if k == ord('r'):
             face_flag = not face_flag
             yolosort = not yolosort
-            #face_locked = False
+            face_locked = False
+            pno = 0
+            skip_pno = 0
             # Reset control to prevent moving when switching model
             #auto_engaged = False
             dm107s.default()

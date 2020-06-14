@@ -6,7 +6,6 @@ from __future__ import division, print_function, absolute_import
 from timeit import time
 from time import strftime
 from math import sqrt
-import os
 import warnings
 import cv2
 import numpy as np
@@ -120,7 +119,7 @@ def main():
         elif yolosort:
             model_in_use = "PERSON"
         
-        # Face recognizer
+        # Person Tracking
         vector_true = np.array((resize_div_2[0], resize_div_2[1]))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
@@ -167,6 +166,7 @@ def main():
                             cv2.FONT_HERSHEY_COMPLEX_SMALL,
                             1, (255, 255, 255), thickness=1, lineType=2)
             
+            # Count how many frames until tracked person is lost
             if not person_found:
                 if pno > 0:
                     if skip_pno >= 5:
@@ -317,9 +317,9 @@ def main():
             out.write(frame)
             frame_index = frame_index + 1
             
-        #fps  = ( fps + (1./(time.time()-t1)) ) / 2
-        #print("fps= %f"%(fps))
-        print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, skip_pno, person_found))
+        fps  = ( fps + (1./(time.time()-t1)) ) / 2
+        print("fps= %f"%(fps))
+        #print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, skip_pno, person_found))
         
     # Exiting
     video_capture.release()
