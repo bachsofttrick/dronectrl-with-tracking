@@ -6,7 +6,6 @@ from __future__ import division, print_function, absolute_import
 from timeit import time
 from time import strftime
 from math import sqrt
-import os
 import warnings
 import cv2
 import numpy as np
@@ -184,7 +183,7 @@ def main():
                             cv2.FONT_HERSHEY_COMPLEX_SMALL,
                             1, (255, 255, 255), thickness=1, lineType=2)
                             
-        # Face recognizer
+        # Person Tracking
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb
             boxs = yolo.detect_image(image)

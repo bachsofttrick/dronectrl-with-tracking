@@ -209,7 +209,7 @@ def main():
                                 cv2.FONT_HERSHEY_COMPLEX_SMALL,
                                 1, (255, 255, 255), thickness=1, lineType=2)
                     
-        # Body recognizer
+        # Person Tracking
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb
             boxs = yolo.detect_image(image)
