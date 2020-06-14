@@ -279,6 +279,7 @@ def main():
                 bbox = det.to_tlbr()
                 cv2.rectangle(frame,(int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,0,0), 2)
         
+        # Show number while typing
         print_out += confirmed_string
         # Draw the center of frame as a circle and autopilot status
         middle_of_frame = (int(resize_div_2[0]), int(resize_div_2[1]))
