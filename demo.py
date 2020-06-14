@@ -245,10 +245,10 @@ def main():
                             else:
                                 pass
                             
-                            if person_area < 100000:
+                            if person_area < 60000:
                                 print("Push forward")
                                 control_disp += "p^ "
-                            elif person_area > 200000:
+                            elif person_area > 80000:
                                 print("Pull back")
                                 control_disp += "pV "
                             else:
