@@ -41,6 +41,10 @@ def main():
     # Facenet-based face recognizer
     person_to_follow = 'bach'
     face_dettect = Recognizer('resnet10')
+    # Count how many frames until we switch to person-tracking
+    person_found = False
+    pno = 0
+    skip_pno = 0
 
     # Flag to choose which model to run
     face_flag = True
@@ -80,7 +84,6 @@ def main():
     n = 0
     fps = 0.0
     fno = 0
-    bno = 0
 
     while True:
         ret, frame = video_capture.read()  
@@ -121,54 +124,34 @@ def main():
         vector_true = np.array((resize_div_2[0], resize_div_2[1]))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
+            person_found = False
             for i in range(len(face_bbox)):
                 face_name = face_bbox[i][4]
                 # Calculate face area
                 face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
                 
-                if face_name == person_to_follow:
-                    bno += 1
-                    # Transfer face to person tracking
-                    person_to_track = face_bbox[i][0:4]
-                    
-                    if auto_engaged:
+                if auto_engaged:
+                    if face_name == person_to_follow:
+                        person_found = True
+                        pno += 1
+
                         # This calculates the vector from your ROI to the center of the screen
                         center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                         vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                         vector_distance = vector_true-vector_target
-                        
-                        if vector_distance[0] < -safety_x:
-                            print("Yaw left.")
-                            control_disp += "y<- "
-                        elif vector_distance[0] > safety_x:
-                            print("Yaw right.")
-                            control_disp += "y-> "
-                        else:
-                            pass
-                        
-                        if vector_distance[1] > safety_y:
-                            print("Fly up.")
-                            control_disp += "t^ "
-                        elif vector_distance[1] < -safety_y:
-                            print("Fly down.")
-                            control_disp += "tV "
-                        else:
-                            pass
-                        
-                        if face_area < 9000:
-                            print("Push forward")
-                            control_disp += "p^ "
-                        elif face_area > 16000:
-                            print("Pull back")
-                            control_disp += "pV "
-                        else:
-                            pass
-                    
                         # Print center of bounding box and vector calculations
                         print_out += str(face_area)
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                         # Draw the safety zone
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
+                        
+                        # Transfer face to person tracking
+                        if pno >= 30:
+                            person_to_track = face_bbox[i][0:4]
+                            face_flag = False
+                            yolosort = True
+                            pno = 0
+                            skip_pno = 0
                     
                 # Draw bounding box over face
                 cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -183,7 +166,15 @@ def main():
                 cv2.putText(frame, str(round(face_bbox[i][5][0], 3)), (_text_x, _text_y + 17),
                             cv2.FONT_HERSHEY_COMPLEX_SMALL,
                             1, (255, 255, 255), thickness=1, lineType=2)
-                            
+            
+            if not person_found:
+                if pno > 0:
+                    if skip_pno >= 5:
+                        pno = 0
+                        skip_pno = 0
+                    else:
+                        skip_pno += 1
+            
         # Face recognizer
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb
@@ -221,6 +212,8 @@ def main():
                     else:
                         face_locked = False
                         print("Retry capture.")
+                        face_flag = True
+                        yolosort = False
                 person_to_track = None
                
                 # Calculate person bounding box area
@@ -294,6 +287,8 @@ def main():
             face_flag = not face_flag
             yolosort = not yolosort
             face_locked = False
+            pno = 0
+            skip_pno = 0
         if k == ord('o'):
             auto_engaged = not auto_engaged
         # Number key for entering ID to track
@@ -322,9 +317,9 @@ def main():
             out.write(frame)
             frame_index = frame_index + 1
             
-        fps  = ( fps + (1./(time.time()-t1)) ) / 2
-        print("fps= %f"%(fps))
-        #print("frame= %d, bach= %d" % (fno, bno))
+        #fps  = ( fps + (1./(time.time()-t1)) ) / 2
+        #print("fps= %f"%(fps))
+        print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, skip_pno, person_found))
         
     # Exiting
     video_capture.release()
