@@ -63,7 +63,7 @@ def main():
     confirmed_string = ""
         
     # Open stream
-    #video_capture = VideoGet("http://192.168.43.99:8080/video").start()
+    #video_capture = VideoGet("http://192.168.43.111:8080/video").start()
     video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
     #video_capture = VideoGet('0').start()
     
@@ -80,7 +80,7 @@ def main():
     safety_y = 100
     # For person tracking
     safety_x_person = 150
-    safety_y_person = 200
+    safety_y_person = 100
     
     writeVideo_flag = True 
     if writeVideo_flag:
@@ -97,6 +97,7 @@ def main():
 
     while True:
         ret, frame = video_capture.update()
+        '''
         if ret != True:
             f_drop += 1
             if f_drop > 10:
@@ -104,6 +105,7 @@ def main():
                 break
         else:
             f_drop = 0
+        '''
         t1 = time.time()        
         #frame = cv2.flip(frame, 1)
         
@@ -273,14 +275,14 @@ def main():
                                     dm107s.throttle = 128
                                 pass
                             
-                            if person_area < 60000:
+                            if person_area < 55000:
                                 print("Push forward")
                                 control_disp += "p^ "
-                                dm107s.pitch = 128 + 30 + 25
+                                dm107s.pitch = 128 + 75
                             elif person_area > 80000:
                                 print("Pull back")
                                 control_disp += "pV "
-                                dm107s.pitch = 128 - 30 - 10
+                                dm107s.pitch = 128 - 20
                             else:
                                 dm107s.pitch = 128
                                 pass
@@ -430,6 +432,7 @@ def main():
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
         print("fps= %f"%(fps))
+        print("bach= %d/%d, person_found= %d" % (pno, skip_pno, person_found))
         
     # Exiting
     video_capture.stop()

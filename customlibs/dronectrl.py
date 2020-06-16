@@ -167,4 +167,5 @@ class Drone():
 			self.yaw = 128
 			self.commands = 4
 			self.onoff = 0
+			self._calibrate_flag = True
 			self._calibrate_timer = time()
