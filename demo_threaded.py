@@ -138,20 +138,19 @@ def main():
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             person_found = False
+            if auto_engaged:
             # Prevent autopilot when there is no face detected
-            if len(face_bbox) == 0:
-                if auto_engaged:
+                if len(face_bbox) == 0:
                     dm107s.yaw = 128
                     dm107s.pitch = 128
                     if auto_throttle:
                         dm107s.throttle = 128
-            else:
-                for i in range(len(face_bbox)):
-                    face_name = face_bbox[i][4]
-                    # Calculate face area
-                    face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
-                    
-                    if auto_engaged:
+                else:
+                    for i in range(len(face_bbox)):
+                        face_name = face_bbox[i][4]
+                        # Calculate face area
+                        face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
+                        
                         if face_name == person_to_follow:
                             person_found = True
                             pno += 1
@@ -174,28 +173,28 @@ def main():
                                 yolosort = True
                                 pno = 0
                                 total_pno = 0
-                        
-                    # Draw bounding box over face
-                    cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
-                    _text_x = face_bbox[i][0]
-                    _text_y = face_bbox[i][3] + 20
+                            
+                        # Draw bounding box over face
+                        cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
+                        _text_x = face_bbox[i][0]
+                        _text_y = face_bbox[i][3] + 20
 
-                    # Write name on frame
-                    cv2.putText(frame, str(face_name), (_text_x, _text_y + 17*2), cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                1, (255, 255, 255), thickness=1, lineType=2)
-                    cv2.putText(frame, str(face_bbox[i][0:4]), (_text_x, _text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                1, (255, 255, 255), thickness=1, lineType=2)
-                    cv2.putText(frame, str(round(face_bbox[i][5][0], 3)), (_text_x, _text_y + 17),
-                                cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                1, (255, 255, 255), thickness=1, lineType=2)
-            
-            # Count how many frames until tracked person is lost
-            if not person_found:
-                if pno > 0:
-                    total_pno += 1
-                if total_pno >= 30 and (pno / total_pno) < 0.5:
-                    pno = 0
-                    total_pno = 0
+                        # Write name on frame
+                        cv2.putText(frame, str(face_name), (_text_x, _text_y + 17*2), cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1, (255, 255, 255), thickness=1, lineType=2)
+                        cv2.putText(frame, str(face_bbox[i][0:4]), (_text_x, _text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1, (255, 255, 255), thickness=1, lineType=2)
+                        cv2.putText(frame, str(round(face_bbox[i][5][0], 3)), (_text_x, _text_y + 17),
+                                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1, (255, 255, 255), thickness=1, lineType=2)
+                
+                # Count how many frames until tracked person is lost
+                if not person_found:
+                    if pno > 0:
+                        total_pno += 1
+                    if total_pno >= 30 and (pno / total_pno) < 0.5:
+                        pno = 0
+                        total_pno = 0
             
         # Person tracking
         if yolosort:
