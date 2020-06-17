@@ -43,7 +43,7 @@ def main():
     # Count how many frames until we switch to person-tracking
     person_found = False
     pno = 0
-    skip_pno = 0
+    total_pno = 0
 
     # Flag to choose which model to run
     face_flag = True
@@ -68,7 +68,7 @@ def main():
     safety_y = 100
     # For person tracking
     safety_x_person = 150
-    safety_y_person = 200
+    safety_y_person = 100
     
     writeVideo_flag = False 
     if writeVideo_flag:
@@ -119,7 +119,7 @@ def main():
         elif yolosort:
             model_in_use = "PERSON"
         
-        # Person Tracking
+        # Face recognizer
         vector_true = np.array((resize_div_2[0], resize_div_2[1]))
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
@@ -145,12 +145,12 @@ def main():
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                         
                         # Transfer face to person tracking
-                        if (pno + skip_pno) >= 30 and (pno / skip_pno) >= 3:
+                        if total_pno >= 30 and (pno / total_pno) >= 0.5:
                             person_to_track = face_bbox[i][0:4]
                             face_flag = False
                             yolosort = True
                             pno = 0
-                            skip_pno = 0
+                            total_pno = 0
                     
                 # Draw bounding box over face
                 cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -168,13 +168,13 @@ def main():
             
             # Count how many frames until tracked person is lost
             if not person_found:
-                if (pno + skip_pno) >= 30:
+                if pno > 0:
+                    total_pno += 1
+                if total_pno >= 30 and (pno / total_pno) < 0.5:
                     pno = 0
-                    skip_pno = 0
-                else:
-                    skip_pno += 1
+                    total_pno = 0
             
-        # Face recognizer
+        # Person tracking
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb
             boxs = yolo.detect_image(image)
@@ -244,7 +244,7 @@ def main():
                             else:
                                 pass
                             
-                            if person_area < 60000:
+                            if person_area < 45000:
                                 print("Push forward")
                                 control_disp += "p^ "
                             elif person_area > 80000:
@@ -287,7 +287,7 @@ def main():
             yolosort = not yolosort
             face_locked = False
             pno = 0
-            skip_pno = 0
+            total_pno = 0
         if k == ord('o'):
             auto_engaged = not auto_engaged
         # Number key for entering ID to track
@@ -318,7 +318,7 @@ def main():
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
         print("fps= %f"%(fps))
-        #print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, skip_pno, person_found))
+        #print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, total_pno, person_found))
         
     # Exiting
     video_capture.release()
