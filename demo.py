@@ -139,6 +139,34 @@ def main():
                         center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                         vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                         vector_distance = vector_true-vector_target
+                        
+                        if vector_distance[0] < -safety_x:
+                            print("Yaw left.")
+                            control_disp += "y<- "
+                        elif vector_distance[0] > safety_x:
+                            print("Yaw right.")
+                            control_disp += "y-> "
+                        else:
+                            pass
+                        
+                        if vector_distance[1] > safety_y:
+                            print("Fly up.")
+                            control_disp += "t^ "
+                        elif vector_distance[1] < -safety_y:
+                            print("Fly down.")
+                            control_disp += "tV "
+                        else:
+                            pass
+                        
+                        if face_area < 9000:
+                            print("Push forward")
+                            control_disp += "p^ "
+                        elif face_area > 16000:
+                            print("Pull back")
+                            control_disp += "pV "
+                        else:
+                            pass
+                        
                         # Print center of bounding box and vector calculations
                         print_out += str(face_area)
                         cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)

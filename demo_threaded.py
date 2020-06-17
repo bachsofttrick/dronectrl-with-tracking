@@ -160,6 +160,43 @@ def main():
                             center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                             vector_distance = vector_true-vector_target
+                            
+                            if vector_distance[0] < -safety_x:
+                                print("Yaw left.")
+                                control_disp += "y<- "
+                                dm107s.yaw = 128 + velocity
+                            elif vector_distance[0] > safety_x:
+                                print("Yaw right.")
+                                control_disp += "y-> "
+                                dm107s.yaw = 128 - velocity
+                            else:
+                                dm107s.yaw = 128
+                            
+                            if vector_distance[1] > safety_y:
+                                print("Fly up.")
+                                control_disp += "t^ "
+                                if auto_throttle:
+                                    dm107s.throttle = 128 + 15
+                            elif vector_distance[1] < -safety_y:
+                                print("Fly down.")
+                                control_disp += "tV "
+                                if auto_throttle:
+                                    dm107s.throttle = 128 - 70
+                            else:
+                                if auto_throttle:
+                                    dm107s.throttle = 128
+                            
+                            if face_area < 9000:
+                                print("Push forward")
+                                control_disp += "p^ "
+                                dm107s.pitch = 128 + velocity
+                            elif face_area > 16000:
+                                print("Pull back")
+                                control_disp += "pV "
+                                dm107s.pitch = 128 - velocity - 5
+                            else:
+                                dm107s.pitch = 128
+                            
                             # Print center of bounding box and vector calculations
                             print_out += str(face_area)
                             cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
