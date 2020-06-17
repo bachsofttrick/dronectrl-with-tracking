@@ -133,6 +133,7 @@ def main():
                     if face_name == person_to_follow:
                         person_found = True
                         pno += 1
+                        total_pno += 1
 
                         # This calculates the vector from your ROI to the center of the screen
                         center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
@@ -318,7 +319,7 @@ def main():
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
         print("fps= %f"%(fps))
-        #print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, total_pno, person_found))
+        print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, total_pno, person_found))
         
     # Exiting
     video_capture.release()
