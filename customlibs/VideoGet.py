@@ -41,10 +41,11 @@ class VideoGet:
                     sleep(0.005)
             '''
             try:
-                (temp_grabbed, temp_frame) = self._stream.read()
+                (self.grabbed, self.frame) = self._stream.read()
+                (self.temp_grabbed, self.temp_frame) = (self.grabbed, self.frame)
             except:
                 continue
-            (self.grabbed, self.frame) = (temp_grabbed, temp_frame)
+                (self.grabbed, self.frame) = (self.temp_grabbed, self.temp_frame)
             if (self.src[0:20] == "rtsp://192.168.100.1"):
                 sleep(0.005)
     
