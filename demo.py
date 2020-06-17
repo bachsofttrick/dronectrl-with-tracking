@@ -145,7 +145,7 @@ def main():
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                         
                         # Transfer face to person tracking
-                        if pno >= 30:
+                        if (pno + skip_pno) >= 30 and (pno / skip_pno) >= 3:
                             person_to_track = face_bbox[i][0:4]
                             face_flag = False
                             yolosort = True
@@ -168,12 +168,11 @@ def main():
             
             # Count how many frames until tracked person is lost
             if not person_found:
-                if pno > 0:
-                    if skip_pno >= 5:
-                        pno = 0
-                        skip_pno = 0
-                    else:
-                        skip_pno += 1
+                if (pno + skip_pno) >= 30:
+                    pno = 0
+                    skip_pno = 0
+                else:
+                    skip_pno += 1
             
         # Face recognizer
         if yolosort:

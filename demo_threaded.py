@@ -25,7 +25,7 @@ from customlibs.dronectrl import Drone
 
 def main():
     # Open YOLO
-    yolo = YOLO('tiny')
+    yolo = YOLO('full')
 
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -44,11 +44,12 @@ def main():
     # Count how many frames until we switch to person-tracking
     person_found = False
     pno = 0
-    skip_pno = 0
+    #skip_pno = 0
+    total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = True
-    yolosort = False
+    face_flag = False
+    yolosort = True
     
     # Flag to override autopilot
     auto_engaged = False
@@ -154,6 +155,7 @@ def main():
                         if face_name == person_to_follow:
                             person_found = True
                             pno += 1
+                            total_pno += 1
                         
                             # This calculates the vector from your ROI to the center of the screen
                             center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
@@ -166,12 +168,12 @@ def main():
                             cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                             
                             # Transfer face to person tracking
-                            if pno >= 30:
+                            if total_pno >= 30 and (pno / total_pno) >= 0.5:
                                 person_to_track = face_bbox[i][0:4]
                                 face_flag = False
                                 yolosort = True
                                 pno = 0
-                                skip_pno = 0
+                                total_pno = 0
                         
                     # Draw bounding box over face
                     cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
@@ -190,11 +192,10 @@ def main():
             # Count how many frames until tracked person is lost
             if not person_found:
                 if pno > 0:
-                    if skip_pno >= 5:
-                        pno = 0
-                        skip_pno = 0
-                    else:
-                        skip_pno += 1
+                    total_pno += 1
+                if total_pno >= 30 and (pno / total_pno) < 0.5:
+                    pno = 0
+                    total_pno = 0
             
         # Person tracking
         if yolosort:
@@ -275,14 +276,14 @@ def main():
                                     dm107s.throttle = 128
                                 pass
                             
-                            if person_area < 55000:
+                            if person_area < 45000:
                                 print("Push forward")
                                 control_disp += "p^ "
-                                dm107s.pitch = 128 + 75
+                                dm107s.pitch = 128 + 72
                             elif person_area > 80000:
                                 print("Pull back")
                                 control_disp += "pV "
-                                dm107s.pitch = 128 - 20
+                                dm107s.pitch = 128 - 30
                             else:
                                 dm107s.pitch = 128
                                 pass
@@ -321,7 +322,7 @@ def main():
             yolosort = not yolosort
             face_locked = False
             pno = 0
-            skip_pno = 0
+            total_pno = 0
             # Reset control to prevent moving when switching model
             #auto_engaged = False
             dm107s.default()
@@ -432,7 +433,7 @@ def main():
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
         print("fps= %f"%(fps))
-        print("bach= %d/%d, person_found= %d" % (pno, skip_pno, person_found))
+        print("bach= %d/%d, person_found= %d" % (pno, total_pno, person_found))
         
     # Exiting
     video_capture.stop()
