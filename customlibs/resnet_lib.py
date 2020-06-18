@@ -1,6 +1,6 @@
 import cv2
 
-# Library for Resnet10 face detector in OpenCV dnn module
+# Library for Resnet10 SSD face detector in OpenCV dnn module
 class Resnetdnn:
     def __init__(self):
         modelFile = "Models/opencv_face_detector_uint8.pb"
