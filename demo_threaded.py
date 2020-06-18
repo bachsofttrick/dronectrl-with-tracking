@@ -22,11 +22,15 @@ warnings.filterwarnings('ignore')
 from customlibs.face_recog_lib import Recognizer
 from customlibs.VideoGet import VideoGet
 from customlibs.dronectrl import Drone
+from customlibs.mobilenet_lib import Mobilenetdnn
 
 def main():
     # Open YOLO
-    yolo = YOLO('full')
+    #yolo = YOLO('tiny')
 
+    # Open MobileNet SSD
+    model_mnet = Mobilenetdnn()
+    
     # Definition of the parameters
     max_cosine_distance = 0.3
     nn_budget = None
@@ -235,8 +239,9 @@ def main():
             
         # Person tracking
         if yolosort:
-            image = Image.fromarray(frame[...,::-1]) #bgr to rgb
-            boxs = yolo.detect_image(image)
+            #image = Image.fromarray(frame[...,::-1]) #bgr to rgb
+            #boxs = yolo.detect_image(image)
+            boxs = model_mnet.detect(frame, 0.7)
             features = encoder(frame,boxs)
             
             # score to 1.0 here).
@@ -254,6 +259,11 @@ def main():
             
             for track in tracker.tracks:
                 if not track.is_confirmed() or track.time_since_update > 1:
+                    if auto_engaged and confirmed_number == track.track_id:
+                        dm107s.yaw = 128
+                        dm107s.pitch = 128
+                        if auto_throttle:
+                            dm107s.throttle = 128
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
