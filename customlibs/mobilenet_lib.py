@@ -30,5 +30,7 @@ class Mobilenetdnn:
                 y1 = int(mnet_detections[0, 0, i, 4] * frameHeight)
                 x2 = int(mnet_detections[0, 0, i, 5] * frameWidth)
                 y2 = int(mnet_detections[0, 0, i, 6] * frameHeight)
-                bboxes.append([x1,y1,x2,y2])
+                w = x2 - x1
+                h = y2 - y1
+                bboxes.append([x1,y1,w,h])
         return bboxes

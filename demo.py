@@ -21,10 +21,14 @@ warnings.filterwarnings('ignore')
 
 # Custom import lib
 from customlibs.face_recog_lib import Recognizer
+from customlibs.mobilenet_lib import Mobilenetdnn
 
 def main():
     # Open YOLO
-    yolo = YOLO('tiny')
+    #yolo = YOLO('tiny')
+    
+    # Open MobileNet SSD
+    model_mnet = Mobilenetdnn()
     
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -46,8 +50,8 @@ def main():
     total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = True
-    yolosort = False
+    face_flag = False
+    yolosort = True
     
     # Flag to override autopilot
     auto_engaged = False
@@ -205,8 +209,9 @@ def main():
             
         # Person tracking
         if yolosort:
-            image = Image.fromarray(frame[...,::-1]) #bgr to rgb
-            boxs = yolo.detect_image(image)
+            #image = Image.fromarray(frame[...,::-1]) #bgr to rgb
+            #boxs = yolo.detect_image(image)
+            boxs = model_mnet.detect(frame, 0.7)
             features = encoder(frame,boxs)
             
             # score to 1.0 here).
@@ -217,6 +222,7 @@ def main():
             scores = np.array([d.confidence for d in detections])
             indices = preprocessing.non_max_suppression(boxes, nms_max_overlap, scores)
             detections = [detections[i] for i in indices]
+            #print(boxs)
             
             # Call the tracker
             tracker.predict()
@@ -224,7 +230,7 @@ def main():
             
             for track in tracker.tracks:
                 if not track.is_confirmed() or track.time_since_update > 1:
-                    print(fno, track.track_id, 'not found.')
+                    #print(fno, track.track_id, 'not found.')
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
@@ -249,7 +255,7 @@ def main():
                 person_area = int(bbox[2] - bbox[0]) * int(bbox[3] - bbox[1])
                 
                 if face_locked:
-                    print(fno, track.track_id, confirmed_number == track.track_id)
+                    #print(fno, track.track_id, confirmed_number == track.track_id)
                     if confirmed_number == track.track_id:
                         if auto_engaged:
                             # This calculates the vector from your ROI to the center of the screen
@@ -348,7 +354,7 @@ def main():
             frame_index = frame_index + 1
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
-        #print("fps= %f"%(fps))
+        print("fps= %f"%(fps))
         #print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, total_pno, person_found))
         
     # Exiting

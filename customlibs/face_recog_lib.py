@@ -42,7 +42,7 @@ class Recognizer:
             print('Yolov2_tiny-face loaded.')
         elif option == 'resnet10':
             self.model_rnet = Resnetdnn()
-            print('Resnet10 loaded.')
+            print('Resnet10 SSD loaded.')
 
         # Get input and output tensors
         self.images_placeholder = tf.get_default_graph().get_tensor_by_name("input:0")
