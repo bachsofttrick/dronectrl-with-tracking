@@ -1,10 +1,13 @@
 import cv2
+from keras import backend as K
+import tensorflow as tf
 
 # Library for MobileNet SSD object detector in OpenCV dnn module
 class Mobilenetdnn:
     def __init__(self):
         modelFile = "Models/MobileNetSSD_deploy.caffemodel"
         configFile = "Models/MobileNetSSD_deploy.prototxt"
+        self._set_ram() # set ram size
         self.model_mnet = cv2.dnn.readNetFromCaffe(configFile, modelFile)
         self.classNames = { 0: 'background',
         1: 'aeroplane', 2: 'bicycle', 3: 'bird', 4: 'boat',
@@ -34,3 +37,9 @@ class Mobilenetdnn:
                 h = y2 - y1
                 bboxes.append([x1,y1,w,h])
         return bboxes
+
+    def _set_ram(self):
+        ram_config = tf.ConfigProto()
+        ram_config.gpu_options.per_process_gpu_memory_fraction = 0.7
+        K.set_session(tf.Session(config=ram_config))
+        
