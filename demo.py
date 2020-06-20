@@ -354,7 +354,7 @@ def main():
             frame_index = frame_index + 1
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
-        #print("fps= %f"%(fps))
+        print("fps= %f"%(fps))
         #print("frame= %d, bach= %d/%d, person_found= %d" % (fno, pno, total_pno, person_found))
         
     # Exiting

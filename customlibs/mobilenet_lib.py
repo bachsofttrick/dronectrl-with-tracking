@@ -38,6 +38,10 @@ class Mobilenetdnn:
                 bboxes.append([x1,y1,w,h])
         return bboxes
 
+    '''
+    In case MobileNet is selected instead of Yolov3
+    This is to prevent error cause by Lubuntu 19.10 taking all the VRAM
+    '''
     def _set_ram(self):
         ram_config = tf.ConfigProto()
         ram_config.gpu_options.per_process_gpu_memory_fraction = 0.7
