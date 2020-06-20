@@ -210,6 +210,7 @@ def main():
                             # Transfer face to person tracking
                             if total_pno >= 30 and (pno / total_pno) >= 0.5:
                                 person_to_track = face_bbox[i][0:4]
+                                dm107s.default()
                                 face_flag = False
                                 yolosort = True
                                 pno = 0
@@ -268,12 +269,7 @@ def main():
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
                 if person_to_track:
-                    number_of_true = 0
-                    number_of_true = (number_of_true + 1) if person_to_track[0] >= bbox[0] else number_of_true
-                    number_of_true = (number_of_true + 1) if person_to_track[1] >= bbox[1] else number_of_true
-                    number_of_true = (number_of_true + 1) if person_to_track[2] <= bbox[2] else number_of_true
-                    number_of_true = (number_of_true + 1) if person_to_track[3] < bbox[3] else number_of_true
-                    if number_of_true == 4:
+                    if person_to_track[0] > bbox[0] and person_to_track[2] < bbox[2] and person_to_track[3] < bbox[3]:
                         print("Captured.")
                         face_locked = True
                         confirmed_number = track.track_id
@@ -370,7 +366,6 @@ def main():
             pno = 0
             total_pno = 0
             # Reset control to prevent moving when switching model
-            #auto_engaged = False
             dm107s.default()
         # Number key for entering ID to track
         num_string = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
