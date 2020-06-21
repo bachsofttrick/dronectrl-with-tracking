@@ -235,7 +235,8 @@ def main():
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
                 if person_to_track:
-                    if person_to_track[0] > bbox[0] and person_to_track[2] < bbox[2] and person_to_track[3] < bbox[3]:
+                    if person_to_track[0] > bbox[0] and person_to_track[2] < bbox[2] and person_to_track[3] < bbox[3]
+                    and person_to_track[0] < bbox[2] and person_to_track[2] > bbox[0] and person_to_track[3] > bbox[1]:
                         print("Captured.")
                         face_locked = True
                         confirmed_number = track.track_id
