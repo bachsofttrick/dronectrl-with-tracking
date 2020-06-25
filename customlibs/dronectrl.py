@@ -21,7 +21,7 @@ class Drone():
 		self._calibrate_flag = False
 		# Connect to UDP port
 		self.sess = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
-		self.sess.connect(('192.168.100.1', 19798))
+		#self.sess.connect(('192.168.100.1', 19798))
 		# Initialize timer value
 		self._takeoff_timer = 0
 		self._calibrate_timer = 0
@@ -51,7 +51,8 @@ class Drone():
 	def send_ctrl(self):
 		while not self._stopped:
 			self._package = self._get_packet()
-			self.sess.send(self._package)
+			#self.sess.send(self._package)
+			self.sess.sendto(self._package, ('192.168.100.1', 19798))
 			self.Flag_off()
 			sleep(0.02)
 	
