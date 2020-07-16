@@ -9,3 +9,5 @@
 *.pbtxt
 *.pyc
 *.avi
+*.caffemodel
+*.prototxt
