@@ -131,23 +131,22 @@ def main():
         if face_flag:
             face_bbox = face_dettect.recognize(frame, person_to_follow)
             # Prevent autopilot when there is no face detected
-            if len(face_bbox) == 0:
-                if auto_engaged:
+            if auto_engaged:
+                if len(face_bbox) == 0:
                     dm107s.yaw = 128
                     dm107s.pitch = 128
                     if auto_throttle:
                         dm107s.throttle = 128
-            else:
-                for i in range(len(face_bbox)):
-                    face_name = face_bbox[i][4]
-                    # Calculate face area
-                    face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
-                    
-                    if face_name == person_to_follow:
-                        # Transfer face to person tracking
-                        person_to_track = face_bbox[i][0:4]
+                else:
+                    for i in range(len(face_bbox)):
+                        face_name = face_bbox[i][4]
+                        # Calculate face area
+                        face_area = int(face_bbox[i][2] - face_bbox[i][0]) * int(face_bbox[i][3] - face_bbox[i][1])
                         
-                        if auto_engaged:
+                        if face_name == person_to_follow:
+                            # Transfer face to person tracking
+                            person_to_track = face_bbox[i][0:4]
+                            
                             # This calculates the vector from your ROI to the center of the screen
                             center_of_bound_box = np.array(((face_bbox[i][0] + face_bbox[i][2])/2, (face_bbox[i][1] + face_bbox[i][3])/2))
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
@@ -194,22 +193,22 @@ def main():
                             cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,100,255), 2)
                             # Draw the safety zone
                             cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
-                        
-                    # Draw bounding box over face
-                    cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
-                    _text_x = face_bbox[i][0]
-                    _text_y = face_bbox[i][3] + 20
+                            
+                        # Draw bounding box over face
+                        cv2.rectangle(frame, (face_bbox[i][0], face_bbox[i][1]), (face_bbox[i][2], face_bbox[i][3]), (0, 255, 0), 2)
+                        _text_x = face_bbox[i][0]
+                        _text_y = face_bbox[i][3] + 20
 
-                    # Write name on frame
-                    cv2.putText(frame, str(face_name), (_text_x, _text_y + 17*2), cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                1, (255, 255, 255), thickness=1, lineType=2)
-                    cv2.putText(frame, str(face_bbox[i][0:4]), (_text_x, _text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                1, (255, 255, 255), thickness=1, lineType=2)
-                    cv2.putText(frame, str(round(face_bbox[i][5][0], 3)), (_text_x, _text_y + 17),
-                                cv2.FONT_HERSHEY_COMPLEX_SMALL,
-                                1, (255, 255, 255), thickness=1, lineType=2)
+                        # Write name on frame
+                        cv2.putText(frame, str(face_name), (_text_x, _text_y + 17*2), cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1, (255, 255, 255), thickness=1, lineType=2)
+                        cv2.putText(frame, str(face_bbox[i][0:4]), (_text_x, _text_y), cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1, (255, 255, 255), thickness=1, lineType=2)
+                        cv2.putText(frame, str(round(face_bbox[i][5][0], 3)), (_text_x, _text_y + 17),
+                                    cv2.FONT_HERSHEY_COMPLEX_SMALL,
+                                    1, (255, 255, 255), thickness=1, lineType=2)
                     
-        # Body recognizer
+        # Person Tracking
         if yolosort:
             image = Image.fromarray(frame[...,::-1]) #bgr to rgb
             boxs = yolo.detect_image(image)
@@ -286,7 +285,7 @@ def main():
                                     dm107s.throttle = 128
                                 pass
                             
-                            if person_area < 60000:
+                            if person_area < 45000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 dm107s.pitch = 128 + 30 + 25
