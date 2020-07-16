@@ -148,7 +148,7 @@ class Drone():
 			self.commands = 0
 			self.onoff = 1
 			self._calibrate_flag = False
-	
+
 	# Stop IMMEDIATELY
 	def emergency_stop(self):
 		self.roll = 128
