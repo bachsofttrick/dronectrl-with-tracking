@@ -48,7 +48,6 @@ def main():
     # Count how many frames until we switch to person-tracking
     person_found = False
     pno = 0
-    #skip_pno = 0
     total_pno = 0
 
     # Flag to choose which model to run
@@ -145,10 +144,11 @@ def main():
             if auto_engaged:
             # Prevent autopilot when there is no face detected
                 if len(face_bbox) == 0:
-                    dm107s.yaw = 128
-                    dm107s.pitch = 128
-                    if auto_throttle:
-                        dm107s.throttle = 128
+                    if do_you_have_drone:
+                        dm107s.yaw = 128
+                        dm107s.pitch = 128
+                        if auto_throttle:
+                            dm107s.throttle = 128
                 else:
                     for i in range(len(face_bbox)):
                         face_name = face_bbox[i][4]
@@ -168,38 +168,47 @@ def main():
                             if vector_distance[0] < -safety_x:
                                 print("Yaw left.")
                                 control_disp += "y<- "
-                                dm107s.yaw = 128 + velocity
+                                if do_you_have_drone:
+                                    dm107s.yaw = 128 + velocity
                             elif vector_distance[0] > safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
-                                dm107s.yaw = 128 - velocity
+                                if do_you_have_drone:
+                                    dm107s.yaw = 128 - velocity
                             else:
-                                dm107s.yaw = 128
+                                if do_you_have_drone:
+                                    dm107s.yaw = 128
                             
                             if vector_distance[1] > safety_y:
                                 print("Fly up.")
                                 control_disp += "t^ "
-                                if auto_throttle:
-                                    dm107s.throttle = 128 + 15
+                                if do_you_have_drone:
+                                    if auto_throttle:
+                                        dm107s.throttle = 128 + 15
                             elif vector_distance[1] < -safety_y:
                                 print("Fly down.")
                                 control_disp += "tV "
-                                if auto_throttle:
-                                    dm107s.throttle = 128 - 70
+                                if do_you_have_drone:
+                                    if auto_throttle:
+                                        dm107s.throttle = 128 - 70
                             else:
-                                if auto_throttle:
-                                    dm107s.throttle = 128
+                                if do_you_have_drone:
+                                    if auto_throttle:
+                                        dm107s.throttle = 128
                             
                             if face_area < 9000:
                                 print("Push forward")
                                 control_disp += "p^ "
-                                dm107s.pitch = 128 + velocity
+                                if do_you_have_drone:
+                                    dm107s.pitch = 128 + velocity
                             elif face_area > 16000:
                                 print("Pull back")
                                 control_disp += "pV "
-                                dm107s.pitch = 128 - velocity - 5
+                                if do_you_have_drone:
+                                    dm107s.pitch = 128 - velocity - 5
                             else:
-                                dm107s.pitch = 128
+                                if do_you_have_drone:
+                                    dm107s.pitch = 128
                             
                             # Print center of bounding box and vector calculations
                             print_out += str(face_area)
@@ -210,7 +219,8 @@ def main():
                             # Transfer face to person tracking
                             if total_pno >= 30 and (pno / total_pno) >= 0.5:
                                 person_to_track = face_bbox[i][0:4]
-                                dm107s.default()
+                                if do_you_have_drone:
+                                    dm107s.default()
                                 face_flag = False
                                 yolosort = True
                                 pno = 0
@@ -261,10 +271,11 @@ def main():
             for track in tracker.tracks:
                 if not track.is_confirmed() or track.time_since_update > 1:
                     if auto_engaged and confirmed_number == track.track_id:
-                        dm107s.yaw = 128
-                        dm107s.pitch = 128
-                        if auto_throttle:
-                            dm107s.throttle = 128
+                        if do_you_have_drone:
+                            dm107s.yaw = 128
+                            dm107s.pitch = 128
+                            if auto_throttle:
+                                dm107s.throttle = 128
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
@@ -294,14 +305,16 @@ def main():
                             if vector_distance[0] < -safety_x_person:
                                 print("Yaw left.")
                                 control_disp += "y<- "
-                                dm107s.yaw = 128 + velocity
+                                if do_you_have_drone:
+                                    dm107s.yaw = 128 + velocity
                             elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
-                                dm107s.yaw = 128 - velocity
+                                if do_you_have_drone:
+                                    dm107s.yaw = 128 - velocity
                             else:
-                                dm107s.yaw = 128
-                                pass
+                                if do_you_have_drone:
+                                    dm107s.yaw = 128
                             
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
