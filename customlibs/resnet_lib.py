@@ -6,6 +6,10 @@ class Resnetdnn:
         modelFile = "Models/opencv_face_detector_uint8.pb"
         configFile = "Models/opencv_face_detector.pbtxt"
         self.model_rnet = cv2.dnn.readNetFromTensorflow(modelFile, configFile)
+        cuda_on = True
+        if cuda_on:
+            self.model_rnet.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+            self.model_rnet.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
     def detect(self, frame, conf_threshold):
         frameWidth = frame.shape[1]

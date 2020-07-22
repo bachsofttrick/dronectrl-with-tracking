@@ -51,8 +51,8 @@ def main():
     total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = False
-    yolosort = True
+    face_flag = True
+    yolosort = False
     
     # Flag to override autopilot
     auto_engaged = False
@@ -72,7 +72,7 @@ def main():
     #video_capture = VideoGet('0').start()
     
     # Enter drone and control speed
-    do_you_have_drone = True
+    do_you_have_drone = False
     velocity = 30
     velocity2 = 120
     if do_you_have_drone:
@@ -86,7 +86,7 @@ def main():
     safety_x_person = 150
     safety_y_person = 100
     
-    writeVideo_flag = True 
+    writeVideo_flag = False 
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
         w = 1280
@@ -319,28 +319,34 @@ def main():
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
                                 control_disp += "t^ "
-                                if auto_throttle:
-                                    dm107s.throttle = 128 + 15
+                                if do_you_have_drone:
+                                    if auto_throttle:
+                                        dm107s.throttle = 128 + 15
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
                                 control_disp += "tV "
-                                if auto_throttle:
-                                    dm107s.throttle = 128 - 70
+                                if do_you_have_drone:
+                                    if auto_throttle:
+                                        dm107s.throttle = 128 - 70
                             else:
-                                if auto_throttle:
-                                    dm107s.throttle = 128
+                                if do_you_have_drone:
+                                    if auto_throttle:
+                                        dm107s.throttle = 128
                                 pass
                             
                             if person_area < 45000:
                                 print("Push forward")
                                 control_disp += "p^ "
-                                dm107s.pitch = 128 + 72
+                                if do_you_have_drone:
+                                    dm107s.pitch = 128 + 72
                             elif person_area > 80000:
                                 print("Pull back")
                                 control_disp += "pV "
-                                dm107s.pitch = 128 - 30
+                                if do_you_have_drone:
+                                    dm107s.pitch = 128 - 30
                             else:
-                                dm107s.pitch = 128
+                                if do_you_have_drone:
+                                    dm107s.pitch = 128
                                 pass
                         
                             # Print center of bounding box and vector calculations
@@ -379,7 +385,8 @@ def main():
             pno = 0
             total_pno = 0
             # Reset control to prevent moving when switching model
-            dm107s.default()
+            if do_you_have_drone:
+                dm107s.default()
         # Number key for entering ID to track
         num_string = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         if not face_locked and yolosort:
@@ -393,12 +400,14 @@ def main():
             confirmed_string = ""
             face_locked = False
         
+        # Override autopilot
+        if k == ord('o'):
+            auto_engaged = not auto_engaged
+            if do_you_have_drone:
+                dm107s.default()
+        
         if do_you_have_drone:
             # Control drone
-            # Override autopilot
-            if k == ord('o'):
-                auto_engaged = not auto_engaged
-                dm107s.default()
             # Override auto throttle control
             if k == ord('u'):
                 auto_throttle = not auto_throttle
