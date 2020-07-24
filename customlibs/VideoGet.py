@@ -16,7 +16,8 @@ class VideoGet:
             self._stream = cv2.VideoCapture(src,cv2.CAP_FFMPEG)
         elif src == '0':
             self._stream = cv2.VideoCapture(0)
-        else:
+        elif (src[0:4] == "rtsp"):
+            src = "rtspsrc location=" + src + " latency=0 buffer-mode=auto ! decodebin ! videoconvert ! appsink sync=false"
             self._stream = cv2.VideoCapture(src)
         (self.grabbed, self.frame) = self._stream.read()
         self._stopped = False
