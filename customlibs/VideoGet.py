@@ -11,10 +11,12 @@ class VideoGet:
 
     def __init__(self, src):
         self.src = src
+        '''
         if (src[0:20] == "rtsp://192.168.100.1"):
             os.environ["OPENCV_FFMPEG_CAPTURE_OPTIONS"] = "rtsp_transport;udp"
             self._stream = cv2.VideoCapture(src,cv2.CAP_FFMPEG)
-        elif src == '0':
+        '''
+        if src == '0':
             self._stream = cv2.VideoCapture(0)
         elif (src[0:4] == "rtsp"):
             src = "rtspsrc location=" + src + " latency=0 buffer-mode=auto ! decodebin ! videoconvert ! appsink sync=false"
