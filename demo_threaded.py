@@ -68,8 +68,7 @@ def main():
         
     # Open stream
     #video_capture = VideoGet("http://192.168.43.111:8080/video").start()
-    video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
-    #video_capture = VideoGet('0').start()
+    video_capture = VideoGet("rtsp://192.168.4.101:8554/test").start()
     
     # Enter drone and control speed
     do_you_have_drone = False
