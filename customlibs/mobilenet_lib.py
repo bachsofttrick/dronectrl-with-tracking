@@ -44,7 +44,7 @@ class Mobilenetdnn:
 
     '''
     In case MobileNet is selected instead of Yolov3
-    This is to prevent error cause by Lubuntu 19.10 taking all the VRAM
+    This is to prevent error cause by Tensorflow taking all the VRAM
     '''
     def _set_ram(self):
         ram_config = tf.ConfigProto()
