@@ -9,6 +9,10 @@ class Mobilenetdnn:
         configFile = "Models/MobileNetSSD_deploy.prototxt"
         self._set_ram() # set ram size
         self.model_mnet = cv2.dnn.readNetFromCaffe(configFile, modelFile)
+        cuda_on = True
+        if cuda_on:
+            self.model_mnet.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+            self.model_mnet.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
         self.classNames = { 0: 'background',
         1: 'aeroplane', 2: 'bicycle', 3: 'bird', 4: 'boat',
         5: 'bottle', 6: 'bus', 7: 'car', 8: 'cat', 9: 'chair',
