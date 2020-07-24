@@ -26,10 +26,10 @@ from customlibs.mobilenet_lib import Mobilenetdnn
 
 def main():
     # Open YOLO
-    #yolo = YOLO('tiny')
+    yolo = YOLO('tiny')
 
     # Open MobileNet SSD
-    model_mnet = Mobilenetdnn()
+    #model_mnet = Mobilenetdnn()
     
     # Definition of the parameters
     max_cosine_distance = 0.3
@@ -51,8 +51,8 @@ def main():
     total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = True
-    yolosort = False
+    face_flag = False
+    yolosort = True
     
     # Flag to override autopilot
     auto_engaged = False
@@ -68,7 +68,7 @@ def main():
         
     # Open stream
     #video_capture = VideoGet("http://192.168.43.111:8080/video").start()
-    video_capture = VideoGet("rtsp://192.168.4.101:8554/test").start()
+    video_capture = VideoGet("rtsp://192.168.4.102:8554/test").start()
     
     # Enter drone and control speed
     do_you_have_drone = False
@@ -92,7 +92,7 @@ def main():
         h = 720
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         localtime = strftime("m%md%d-%H%M%S")
-        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 25, (w, h))
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 15, (w, h))
         frame_index = -1 
 
     fps = 0.0
@@ -249,9 +249,9 @@ def main():
             
         # Person tracking
         if yolosort:
-            #image = Image.fromarray(frame[...,::-1]) #bgr to rgb
-            #boxs = yolo.detect_image(image)
-            boxs = model_mnet.detect(frame, 0.7)
+            image = Image.fromarray(frame[...,::-1]) #bgr to rgb
+            boxs = yolo.detect_image(image)
+            #boxs = model_mnet.detect(frame, 0.7)
             features = encoder(frame,boxs)
             
             # score to 1.0 here).
