@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 # Custom import lib
 from customlibs.face_recog_lib import Recognizer
 from customlibs.VideoGet import VideoGet
-from customlibs.dronectrl import Drone
+from customlibs.dronectrl import dm107s
 from customlibs.mobilenet_lib import Mobilenetdnn
 
 def main():
@@ -76,7 +76,7 @@ def main():
     velocity = 30
     velocity2 = 120
     if do_you_have_drone:
-        dm107s = Drone().start()
+        drone = dm107s().start()
     
     # Enter safety zone coordinate
     # For face tracking
@@ -145,10 +145,10 @@ def main():
             # Prevent autopilot when there is no face detected
                 if len(face_bbox) == 0:
                     if do_you_have_drone:
-                        dm107s.yaw = 128
-                        dm107s.pitch = 128
+                        drone.yaw = 128
+                        drone.pitch = 128
                         if auto_throttle:
-                            dm107s.throttle = 128
+                            drone.throttle = 128
                 else:
                     for i in range(len(face_bbox)):
                         face_name = face_bbox[i][4]
@@ -169,46 +169,46 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    dm107s.yaw = 128 + velocity
+                                    drone.yaw = 128 + velocity
                             elif vector_distance[0] > safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    dm107s.yaw = 128 - velocity
+                                    drone.yaw = 128 - velocity
                             else:
                                 if do_you_have_drone:
-                                    dm107s.yaw = 128
+                                    drone.yaw = 128
                             
                             if vector_distance[1] > safety_y:
                                 print("Fly up.")
                                 control_disp += "t^ "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        dm107s.throttle = 128 + 15
+                                        drone.throttle = 128 + 15
                             elif vector_distance[1] < -safety_y:
                                 print("Fly down.")
                                 control_disp += "tV "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        dm107s.throttle = 128 - 70
+                                        drone.throttle = 128 - 70
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        dm107s.throttle = 128
+                                        drone.throttle = 128
                             
                             if face_area < 9000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    dm107s.pitch = 128 + velocity
+                                    drone.pitch = 128 + velocity
                             elif face_area > 16000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    dm107s.pitch = 128 - velocity - 5
+                                    drone.pitch = 128 - velocity - 5
                             else:
                                 if do_you_have_drone:
-                                    dm107s.pitch = 128
+                                    drone.pitch = 128
                             
                             # Print center of bounding box and vector calculations
                             print_out += str(face_area)
@@ -220,7 +220,7 @@ def main():
                             if total_pno >= 30 and (pno / total_pno) >= 0.5:
                                 person_to_track = face_bbox[i][0:4]
                                 if do_you_have_drone:
-                                    dm107s.default()
+                                    drone.default()
                                 face_flag = False
                                 yolosort = True
                                 pno = 0
@@ -272,10 +272,10 @@ def main():
                 if not track.is_confirmed() or track.time_since_update > 1:
                     if auto_engaged and confirmed_number == track.track_id:
                         if do_you_have_drone:
-                            dm107s.yaw = 128
-                            dm107s.pitch = 128
+                            drone.yaw = 128
+                            drone.pitch = 128
                             if auto_throttle:
-                                dm107s.throttle = 128
+                                drone.throttle = 128
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person (WIP)
@@ -306,47 +306,47 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    dm107s.yaw = 128 + velocity
+                                    drone.yaw = 128 + velocity
                             elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    dm107s.yaw = 128 - velocity
+                                    drone.yaw = 128 - velocity
                             else:
                                 if do_you_have_drone:
-                                    dm107s.yaw = 128
+                                    drone.yaw = 128
                             
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
                                 control_disp += "t^ "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        dm107s.throttle = 128 + 15
+                                        drone.throttle = 128 + 15
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
                                 control_disp += "tV "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        dm107s.throttle = 128 - 70
+                                        drone.throttle = 128 - 70
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        dm107s.throttle = 128
+                                        drone.throttle = 128
                                 pass
                             
                             if person_area < 45000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    dm107s.pitch = 128 + 72
+                                    drone.pitch = 128 + 72
                             elif person_area > 80000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    dm107s.pitch = 128 - 30
+                                    drone.pitch = 128 - 30
                             else:
                                 if do_you_have_drone:
-                                    dm107s.pitch = 128
+                                    drone.pitch = 128
                                 pass
                         
                             # Print center of bounding box and vector calculations
@@ -386,7 +386,7 @@ def main():
             total_pno = 0
             # Reset control to prevent moving when switching model
             if do_you_have_drone:
-                dm107s.default()
+                drone.default()
         # Number key for entering ID to track
         num_string = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
         if not face_locked and yolosort:
@@ -404,7 +404,7 @@ def main():
         if k == ord('o'):
             auto_engaged = not auto_engaged
             if do_you_have_drone:
-                dm107s.default()
+                drone.default()
         
         if do_you_have_drone:
             # Control drone
@@ -414,72 +414,72 @@ def main():
             
             # Takeoff and landing
             if k == ord('t'):
-                dm107s.takeoff()
+                drone.takeoff()
 
             # Throttle
             if not auto_throttle:
                 if k == ord('w'):
-                    #dm107s.throttle_up()
+                    #drone.throttle_up()
                     control_disp += "t^ "
-                    dm107s.incremt(0,0,velocity2,0)
+                    drone.incremt(0,0,velocity2,0)
                 elif k == ord('s'):
-                    #dm107s.throttle_dwn()
+                    #drone.throttle_dwn()
                     control_disp += "tV "
-                    dm107s.incremt(0,0,-velocity2,0)
+                    drone.incremt(0,0,-velocity2,0)
                 if k == ord('f'):
-                    dm107s.incremt(0,0,0,0)
+                    drone.incremt(0,0,0,0)
             
             if not auto_engaged:
                 # Throttle
                 if k == ord('w'):
-                    #dm107s.throttle_up()
-                    dm107s.incremt(0,0,velocity2,0)
+                    #drone.throttle_up()
+                    drone.incremt(0,0,velocity2,0)
                 elif k == ord('s'):
-                    #dm107s.throttle_dwn()
-                    dm107s.incremt(0,0,-velocity2,0)
+                    #drone.throttle_dwn()
+                    drone.incremt(0,0,-velocity2,0)
                     
                 # Yaw
                 if k == ord('a'):
-                    #dm107s.yaw_left()
+                    #drone.yaw_left()
                     control_disp += "y<- "
-                    dm107s.incremt(0,0,0,velocity2)
+                    drone.incremt(0,0,0,velocity2)
                 elif k == ord('d'):
-                    #dm107s.yaw_right()
+                    #drone.yaw_right()
                     control_disp += "y-> "
-                    dm107s.incremt(0,0,0,-velocity2)
+                    drone.incremt(0,0,0,-velocity2)
 
                 # Pitch
                 if k == ord('i'):
-                    #dm107s.pitch_fwd()
+                    #drone.pitch_fwd()
                     control_disp += "p^ "
-                    dm107s.incremt(0,velocity2,0,0)
+                    drone.incremt(0,velocity2,0,0)
                 elif k == ord('k'):
-                    #dm107s.pitch_bwd()
+                    #drone.pitch_bwd()
                     control_disp += "pV "
-                    dm107s.incremt(0,-velocity2,0,0)
+                    drone.incremt(0,-velocity2,0,0)
 
                 # Roll
                 if k == ord('j'):
-                    #dm107s.roll_left()
+                    #drone.roll_left()
                     control_disp += "r<- "
-                    dm107s.incremt(-velocity2,0,0,0)
+                    drone.incremt(-velocity2,0,0,0)
                 elif k == ord('l'):
-                    #dm107s.roll_right()
+                    #drone.roll_right()
                     control_disp += "r-> "
-                    dm107s.incremt(velocity2,0,0,0)
+                    drone.incremt(velocity2,0,0,0)
                 
                 if k == ord('f'):
-                    dm107s.incremt(0,0,0,0)
+                    drone.incremt(0,0,0,0)
 
             # STOP NOW
             if k == ord('e'):
                 control_disp = "STOP!"
-                dm107s.emergency_stop()
+                drone.emergency_stop()
             
             # Calibrate gyro
             if k == ord('v'):
                 control_disp = "Calibrate..."
-                dm107s.calib_gyro()
+                drone.calib_gyro()
         
         # Show model in use on frame
         cv2.putText(frame, model_in_use,(0, 20),0, 0.8, (255,0,0),2)
@@ -501,7 +501,7 @@ def main():
     # Exiting
     video_capture.stop()
     if do_you_have_drone:
-        dm107s.close_connection()
+        drone.close_connection()
     if writeVideo_flag:
         out.release()
     cv2.destroyAllWindows()
