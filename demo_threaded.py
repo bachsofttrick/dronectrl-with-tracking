@@ -67,6 +67,7 @@ def main():
     confirmed_string = ""
         
     # Open stream
+    #video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
     #video_capture = VideoGet("http://192.168.43.111:8080/video").start()
     video_capture = VideoGet("rtsp://192.168.4.102:8554/test").start()
     
