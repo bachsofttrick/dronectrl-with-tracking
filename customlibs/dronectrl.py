@@ -226,7 +226,7 @@ class naza():
         self.pitch = 8
         self.throttle = 8
         self.yaw = 8
-        #self._takeoff_flag = False
+        #self._ignite_flag = False
     
     # Increment control
     def incremt(self, rl, pt, th, yw):
@@ -286,11 +286,11 @@ class naza():
         self.pitch = 0
         self.throttle = 0
         self.yaw = 15
-        self._takeoff_flag = True
+        self._ignite_flag = True
     
     # Flip takeoff flag
     def Flag_off(self):
-        if (self._takeoff_flag == True and (time() - self._takeoff_timer >= 1)):
+        if (self._ignite_flag == True and (time() - self._ignite_timer >= 1)):
             self.default()
 
 
