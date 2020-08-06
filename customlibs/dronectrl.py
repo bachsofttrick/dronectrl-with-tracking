@@ -102,8 +102,8 @@ class dm107s():
     
     # Yaw right
     def yaw_right(self):
-        if self.yaw < 255:
-            self.yaw += 127
+        if self.yaw > 1:
+            self.yaw -= 127
     
     # Roll left
     def roll_left(self):
@@ -122,8 +122,8 @@ class dm107s():
     
     # Yaw left
     def yaw_left(self):
-        if self.yaw > 1:
-            self.yaw -= 127
+        if self.yaw < 255:
+            self.yaw += 127
     
     # Takeoff
     def takeoff(self):
@@ -183,6 +183,8 @@ class naza():
         self._ignite_flag = False
         # Connect to UDP port
         self.sess = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
+        self.ip = ip
+        self.port = port
         #self.sess.connect((ip, port))
         # Initialize timer value
         self._ignite_timer = 0
@@ -205,11 +207,11 @@ class naza():
     # Send control to drone
     def send_ctrl(self):
         while not self._stopped:
-            self._package = self.get_hex()
+            self._package = self.get_hex().encode()
             #self.sess.send(self._package)
-            self.sess.sendto(self._package, (ip, port))
-            self.Flag_off()
-            sleep(0.02)
+            self.sess.sendto(self._package, (self.ip, self.port))
+            #self.Flag_off()
+            sleep(0.05)
     
     # Close connection to drone
     def close_connection(self):
@@ -224,7 +226,7 @@ class naza():
         self.pitch = 8
         self.throttle = 8
         self.yaw = 8
-        self._takeoff_flag = False
+        #self._takeoff_flag = False
     
     # Increment control
     def incremt(self, rl, pt, th, yw):

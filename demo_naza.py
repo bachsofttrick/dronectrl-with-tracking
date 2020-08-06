@@ -70,7 +70,7 @@ def main():
     video_capture = VideoGet("rtsp://192.168.4.102:8554/test").start()
     
     # Enter drone and control speed
-    do_you_have_drone = False
+    do_you_have_drone = True
     velocity = 2
     velocity2 = 2
     if do_you_have_drone:
@@ -84,7 +84,7 @@ def main():
     safety_x_person = 150
     safety_y_person = 100
     
-    writeVideo_flag = False 
+    writeVideo_flag = True
     if writeVideo_flag:
     # Define the codec and create VideoWriter object
         w = 1280
@@ -415,56 +415,57 @@ def main():
                 drone.takeoff()
 
             # Throttle
-            if not auto_throttle:
+            if not auto_throttle and not auto_engaged:
                 if k == ord('w'):
-                    #drone.throttle_up()
+                    drone.throttle_up()
                     control_disp += "t^ "
-                    drone.incremt(0,0,1,0)
+                    #drone.incremt(0,0,1,0)
                 elif k == ord('s'):
-                    #drone.throttle_dwn()
+                    drone.throttle_dwn()
                     control_disp += "tV "
-                    drone.incremt(0,0,-1,0)
+                    #drone.incremt(0,0,-1,0)
                 if k == ord('f'):
                     drone.incremt(0,0,0,0)
             
             if not auto_engaged:
+                '''
                 # Throttle
                 if k == ord('w'):
-                    #drone.throttle_up()
-                    drone.incremt(0,0,1,0)
+                    drone.throttle_up()
+                    #drone.incremt(0,0,1,0)
                 elif k == ord('s'):
-                    #drone.throttle_dwn()
-                    drone.incremt(0,0,-1,0)
-                    
+                    drone.throttle_dwn()
+                    #drone.incremt(0,0,-1,0)
+                '''    
                 # Yaw
                 if k == ord('a'):
-                    #drone.yaw_left()
+                    drone.yaw_left()
                     control_disp += "y<- "
-                    drone.incremt(0,0,0,velocity2)
+                    #drone.incremt(0,0,0,-velocity2)
                 elif k == ord('d'):
-                    #drone.yaw_right()
+                    drone.yaw_right()
                     control_disp += "y-> "
-                    drone.incremt(0,0,0,-velocity2)
+                    #drone.incremt(0,0,0,velocity2)
 
                 # Pitch
                 if k == ord('i'):
-                    #drone.pitch_fwd()
+                    drone.pitch_fwd()
                     control_disp += "p^ "
-                    drone.incremt(0,velocity2,0,0)
+                    #drone.incremt(0,velocity2,0,0)
                 elif k == ord('k'):
-                    #drone.pitch_bwd()
+                    drone.pitch_bwd()
                     control_disp += "pV "
-                    drone.incremt(0,-velocity2,0,0)
+                    #drone.incremt(0,-velocity2,0,0)
 
                 # Roll
                 if k == ord('j'):
-                    #drone.roll_left()
+                    drone.roll_left()
                     control_disp += "r<- "
-                    drone.incremt(-velocity2,0,0,0)
+                    #drone.incremt(-velocity2,0,0,0)
                 elif k == ord('l'):
-                    #drone.roll_right()
+                    drone.roll_right()
                     control_disp += "r-> "
-                    drone.incremt(velocity2,0,0,0)
+                    #drone.incremt(velocity2,0,0,0)
                 
                 if k == ord('f'):
                     drone.incremt(0,0,0,0)
