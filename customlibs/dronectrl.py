@@ -226,7 +226,7 @@ class naza():
         self.pitch = 8
         self.throttle = 8
         self.yaw = 8
-        #self._ignite_flag = False
+        self._ignite_flag = False
     
     # Increment control
     def incremt(self, rl, pt, th, yw):
@@ -242,7 +242,7 @@ class naza():
     
     # Roll right
     def roll_right(self):
-        if self.roll < 14:
+        if self.roll < 15:
             self.roll += 1
     
     # Pitch forward
