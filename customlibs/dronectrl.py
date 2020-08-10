@@ -287,10 +287,12 @@ class naza():
         self.throttle = 0
         self.yaw = 15
         self._ignite_flag = True
+        self._ignite_timer = time()
     
     # Flip takeoff flag
     def Flag_off(self):
         if (self._ignite_flag == True and (time() - self._ignite_timer >= 1)):
+            self._ignite_flag == False
             self.default()
 
 
