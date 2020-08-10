@@ -426,19 +426,8 @@ def main():
                     #drone.throttle_dwn()
                     control_disp += "tV "
                     drone.incremt(0,0,-velocity2,0)
-                if k == ord('f'):
-                    drone.incremt(0,0,0,0)
             
             if not auto_engaged:
-                '''
-                # Throttle
-                if k == ord('w'):
-                    #drone.throttle_up()
-                    drone.incremt(0,0,velocity2,0)
-                elif k == ord('s'):
-                    #drone.throttle_dwn()
-                    drone.incremt(0,0,-velocity2,0)
-                '''
                 # Yaw
                 if k == ord('a'):
                     #drone.yaw_left()
