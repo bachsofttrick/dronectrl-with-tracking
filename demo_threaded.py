@@ -51,8 +51,8 @@ def main():
     total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = False
-    yolosort = True
+    face_flag = True
+    yolosort = False
     
     # Flag to override autopilot
     auto_engaged = False
