@@ -51,8 +51,8 @@ def main():
     total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = False
-    yolosort = True
+    face_flag = True
+    yolosort = False
     
     # Flag to override autopilot
     auto_engaged = False
@@ -114,7 +114,7 @@ def main():
         # Resize frame
         resize_to = (1280, 720)
         resize_div_2 = (int(resize_to[0]/2), int(resize_to[1]/2))
-        #frame = cv2.resize(frame, resize_to)
+        frame = cv2.resize(frame, resize_to)
 
         # Show control on the right corner of frame
         control_disp = "" 
@@ -412,7 +412,8 @@ def main():
             
             # Takeoff and landing
             if k == ord('t'):
-                drone.takeoff()
+                #drone.ignite()
+                pass
 
             # Throttle
             if not auto_throttle and not auto_engaged:
