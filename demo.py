@@ -64,7 +64,7 @@ def main():
     confirmed_string = ""
     
     # Open stream
-    video_capture = cv2.VideoCapture("demo2.mp4")
+    video_capture = cv2.VideoCapture("bach face 2.mp4")
 
     # Enter safety zone coordinate
     # For face tracking
