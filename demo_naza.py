@@ -29,7 +29,7 @@ def main():
     yolo = YOLO('tiny')
 
     # Open MobileNet SSD
-    #model_mnet = Mobilenetdnn()
+    #model_mnet = Mobilenetdnn(
     
     # Definition of the parameters
     max_cosine_distance = 0.3
