@@ -97,7 +97,7 @@ ISR(PCINT0_vect){
   else if(last_channel_1 == 1){                                             //Input 8 is not high and changed from 1 to 0.
     last_channel_1 = 0;                                                     //Remember current input state.
     receiver_input_1 = current_time - timer_1;                              //Channel 1 is current_time - timer_1.
-    if(receiver_input_1 > 2500) receiver_input_1 = 1500;
+    if(receiver_input_1 > 2500) receiver_input_1 = center;
   }
   //Channel 2=========================================
   if(PINB & B00000010 ){                                                    //Is input 9 high?
@@ -109,7 +109,7 @@ ISR(PCINT0_vect){
   else if(last_channel_2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
     last_channel_2 = 0;                                                     //Remember current input state.
     receiver_input_2 = current_time - timer_2;                              //Channel 2 is current_time - timer_2.
-    if(receiver_input_2 > 2500) receiver_input_2 = 1500;
+    if(receiver_input_2 > 2500) receiver_input_2 = center;
   }
   //Channel 3=========================================
   if(PINB & B00000100 ){                                                    //Is input 10 high?
@@ -121,7 +121,7 @@ ISR(PCINT0_vect){
   else if(last_channel_3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
     last_channel_3 = 0;                                                     //Remember current input state.
     receiver_input_3 = current_time - timer_3;                              //Channel 3 is current_time - timer_3.
-    if(receiver_input_3 > 2500) receiver_input_3 = 1500;
+    if(receiver_input_3 > 2500) receiver_input_3 = center;
   }
   //Channel 4=========================================
   if(PINB & B00001000 ){                                                    //Is input 11 high?
@@ -133,7 +133,7 @@ ISR(PCINT0_vect){
   else if(last_channel_4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
     last_channel_4 = 0;                                                     //Remember current input state.
     receiver_input_4 = current_time - timer_4;                              //Channel 4 is current_time - timer_4.
-    if(receiver_input_4 > 2500) receiver_input_4 = 1500;
+    if(receiver_input_4 > 2500) receiver_input_4 = center;
   }
   //Channel 5=========================================
   if(PINB & B00010000 ){                                                    //Is input 12 high?
@@ -145,7 +145,7 @@ ISR(PCINT0_vect){
   else if(last_channel_5 == 1){                                             //Input 12 is not high and changed from 1 to 0.
     last_channel_5 = 0;                                                     //Remember current input state.
     receiver_input_5 = current_time - timer_5;                              //Channel 5 is current_time - timer_5.
-    if(receiver_input_5 > 2500) receiver_input_5 = 1500;
+    if(receiver_input_5 > 2500) receiver_input_5 = center;
   }
 }
 
