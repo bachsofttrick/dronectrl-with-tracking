@@ -64,7 +64,7 @@ void setup(){
 //Main program loop
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void loop(){
-  //If channel 5 is higher than 1500, activate pilot by UART
+  //If channel 5 is higher than 1600, activate pilot by UART
   if (receiver_input_5 > 1600){
     PORTB |= B00100000;                                                     //Turn on the warning led.
     getFromSerial();

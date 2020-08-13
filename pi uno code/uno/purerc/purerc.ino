@@ -59,7 +59,7 @@ void loop(){
   //The refresh rate is 100Hz. That means the esc's need there pulse every 10ms.
   while(micros() - loop_timer < 10000);                                     //We wait until 10000us are passed.
 
-  //If channel 5 is higher than 1500, activate pilot by UART
+  //If channel 5 is higher than 1600, activate pilot by UART
   if (receiver_input_5 > 1600){
     PORTB |= B00100000;                                                     //Turn on the warning led.
     getFromSerial();
