@@ -58,10 +58,9 @@ void setup(){
 void loop(){
   //The refresh rate is 100Hz. That means the esc's need there pulse every 10ms.
   while(micros() - loop_timer < 10000);                                     //We wait until 10000us are passed.
-  loop_timer = micros();                                                    //Set the timer for the next loop.
 
   //If channel 5 is higher than 1500, activate pilot by UART
-  if (receiver_input_5 > 1500){
+  if (receiver_input_5 > 1600){
     PORTB |= B00100000;                                                     //Turn on the warning led.
     getFromSerial();
   }
@@ -74,6 +73,7 @@ void loop(){
     roll = receiver_input_4;
   }
 
+  loop_timer = micros();                                                    //Set the timer for the next loop.
   PORTD |= B11110000;                                                       //Set digital outputs 4,5,6 and 7 high.
   timer_channel_1 = throttle + loop_timer;                                  //Calculate the time of the faling edge of the esc-1 pulse.
   timer_channel_2 = yaw + loop_timer;                                       //Calculate the time of the faling edge of the esc-2 pulse.
@@ -106,7 +106,7 @@ ISR(PCINT0_vect){
   else if(last_channel_1 == 1){                                             //Input 8 is not high and changed from 1 to 0.
     last_channel_1 = 0;                                                     //Remember current input state.
     receiver_input_1 = current_time - timer_1;                              //Channel 1 is current_time - timer_1.
-    if(receiver_input_1 > 2500) receiver_input_1 = 0;
+    if(receiver_input_1 > 2500) receiver_input_1 = 1500;
   }
   //Channel 2=========================================
   if(PINB & B00000010 ){                                                    //Is input 9 high?
@@ -118,7 +118,7 @@ ISR(PCINT0_vect){
   else if(last_channel_2 == 1){                                             //Input 9 is not high and changed from 1 to 0.
     last_channel_2 = 0;                                                     //Remember current input state.
     receiver_input_2 = current_time - timer_2;                              //Channel 2 is current_time - timer_2.
-    if(receiver_input_2 > 2500) receiver_input_2 = 0;
+    if(receiver_input_2 > 2500) receiver_input_2 = 1500;
   }
   //Channel 3=========================================
   if(PINB & B00000100 ){                                                    //Is input 10 high?
@@ -130,7 +130,7 @@ ISR(PCINT0_vect){
   else if(last_channel_3 == 1){                                             //Input 10 is not high and changed from 1 to 0.
     last_channel_3 = 0;                                                     //Remember current input state.
     receiver_input_3 = current_time - timer_3;                              //Channel 3 is current_time - timer_3.
-    if(receiver_input_3 > 2500) receiver_input_3 = 0;
+    if(receiver_input_3 > 2500) receiver_input_3 = 1500;
   }
   //Channel 4=========================================
   if(PINB & B00001000 ){                                                    //Is input 11 high?
@@ -142,7 +142,7 @@ ISR(PCINT0_vect){
   else if(last_channel_4 == 1){                                             //Input 11 is not high and changed from 1 to 0.
     last_channel_4 = 0;                                                     //Remember current input state.
     receiver_input_4 = current_time - timer_4;                              //Channel 4 is current_time - timer_4.
-    if(receiver_input_4 > 2500) receiver_input_4 = 0;
+    if(receiver_input_4 > 2500) receiver_input_4 = 1500;
   }
   //Channel 5=========================================
   if(PINB & B00010000 ){                                                    //Is input 12 high?
@@ -154,7 +154,7 @@ ISR(PCINT0_vect){
   else if(last_channel_5 == 1){                                             //Input 12 is not high and changed from 1 to 0.
     last_channel_5 = 0;                                                     //Remember current input state.
     receiver_input_5 = current_time - timer_5;                              //Channel 5 is current_time - timer_5.
-    if(receiver_input_5 > 2500) receiver_input_5 = 0;
+    if(receiver_input_5 > 2500) receiver_input_5 = 1500;
   }
 }
 
