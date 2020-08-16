@@ -51,8 +51,8 @@ def main():
     total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = True
-    yolosort = False
+    face_flag = False
+    yolosort = True
     
     # Flag to override autopilot
     auto_engaged = False
@@ -67,14 +67,14 @@ def main():
     confirmed_string = ""
         
     # Open stream
-    video_capture = VideoGet("rtsp://192.168.4.102:8554/test").start()
+    video_capture = VideoGet("rtsp://192.168.4.101:8554/test").start()
     
     # Enter drone and control speed
     do_you_have_drone = True
-    velocity = 2
+    velocity = 1
     velocity2 = 2
     if do_you_have_drone:
-        drone = naza('192.168.4.102', 5005).start()
+        drone = naza('192.168.4.101', 5005).start()
     
     # Enter safety zone coordinate
     # For face tracking
@@ -167,12 +167,12 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    drone.yaw = 8 - velocity
+                                    drone.yaw = 8 - 1
                             elif vector_distance[0] > safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    drone.yaw = 8 + velocity
+                                    drone.yaw = 8 + 1
                             else:
                                 if do_you_have_drone:
                                     drone.yaw = 8
@@ -304,12 +304,12 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    drone.yaw = 8 - velocity
+                                    drone.yaw = 8 + 1
                             elif vector_distance[0] > safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    drone.yaw = 8 + velocity
+                                    drone.yaw = 8 - 1
                             else:
                                 if do_you_have_drone:
                                     drone.yaw = 8
@@ -332,16 +332,16 @@ def main():
                                         drone.throttle = 8
                                 pass
                             
-                            if person_area < 45000:
+                            if person_area < 60000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    drone.pitch = 8 + velocity
-                            elif person_area > 80000:
+                                    drone.pitch = 8 + 3
+                            elif person_area > 90000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 8 - velocity
+                                    drone.pitch = 8 - 2
                             else:
                                 if do_you_have_drone:
                                     drone.pitch = 8
@@ -352,14 +352,14 @@ def main():
                             cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,255,255), 2)
                         # Draw selected bounding box
                         cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                        cv2.putText(frame, "Tracked-" + str(track.track_id),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                        cv2.putText(frame, "Tracked-" + str(track.track_id),(int(bbox[0]), int(bbox[1]) + 100),0, 5e-3 * 200, (0,255,0),2)
                         # Draw the safety zone
                         cv2.rectangle(frame, (resize_div_2[0] - safety_x_person, resize_div_2[1] - safety_y_person), (resize_div_2[0] + safety_x_person, resize_div_2[1] + safety_y_person), (0,255,255), 2)
                         break
                 else:
                     # Draw bounding box and calculate box area
                     cv2.rectangle(frame, (int(bbox[0]), int(bbox[1])), (int(bbox[2]), int(bbox[3])),(255,255,255), 2)
-                    cv2.putText(frame, str(track.track_id) + "," + str(person_area),(int(bbox[0]), int(bbox[1])),0, 5e-3 * 200, (0,255,0),2)
+                    cv2.putText(frame, str(track.track_id) + "," + str(person_area),(int(bbox[0]), int(bbox[1]) + 100),0, 5e-3 * 200, (0,255,0),2)
                 
             for det in detections:
                 bbox = det.to_tlbr()

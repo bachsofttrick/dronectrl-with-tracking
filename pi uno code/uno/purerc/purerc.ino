@@ -209,10 +209,10 @@ void getFromSerial(){
       }
       else tempvalue[i] = 8;
     }
-    throttle = tempvalue[0]*50 + 1100;
-    yaw = 1900 - tempvalue[1]*50;
-    pitch = tempvalue[2]*50 + 1100;
-    roll = 1900 - tempvalue[3]*50;
+    throttle = tempvalue[0]*25 + 1300;
+    yaw = 1700 - tempvalue[1]*25;
+    pitch = tempvalue[2]*25 + 1300;
+    roll = 1700 - tempvalue[3]*25;
     //read_signal();
   }
 }
