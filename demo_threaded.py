@@ -165,12 +165,12 @@ def main():
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                             vector_distance = vector_true-vector_target
                             
-                            if vector_distance[0] < -safety_x:
+                            if vector_distance[0] > safety_x:
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
                                     drone.yaw = 128 + velocity
-                            elif vector_distance[0] > safety_x:
+                            elif vector_distance[0] < -safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
@@ -302,12 +302,12 @@ def main():
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                             vector_distance = vector_true-vector_target
                             
-                            if vector_distance[0] < -safety_x_person:
+                            if vector_distance[0] > safety_x_person:
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
                                     drone.yaw = 128 + velocity
-                            elif vector_distance[0] > safety_x_person:
+                            elif vector_distance[0] < -safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
@@ -350,6 +350,7 @@ def main():
                                 pass
                         
                             # Print center of bounding box and vector calculations
+                            print_out += str(confirmed_number) + " "
                             print_out += str(person_area)
                             cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,255,255), 2)
                         # Draw selected bounding box

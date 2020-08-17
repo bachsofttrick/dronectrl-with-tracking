@@ -57,7 +57,7 @@ def main():
     # Flag to override autopilot
     auto_engaged = False
     # This is for controlling altitude manually
-    auto_throttle = False
+    auto_throttle = True
     
     # Transfer to person tracking
     person_to_track = None
@@ -67,14 +67,14 @@ def main():
     confirmed_string = ""
         
     # Open stream
-    video_capture = VideoGet("rtsp://192.168.4.101:8554/test").start()
+    video_capture = VideoGet("rtsp://192.168.4.103:8554/test").start()
     
     # Enter drone and control speed
     do_you_have_drone = True
     velocity = 1
     velocity2 = 2
     if do_you_have_drone:
-        drone = naza('192.168.4.101', 5005).start()
+        drone = naza('192.168.4.103', 5005).start()
     
     # Enter safety zone coordinate
     # For face tracking
@@ -163,12 +163,12 @@ def main():
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                             vector_distance = vector_true-vector_target
                             
-                            if vector_distance[0] < -safety_x:
+                            if vector_distance[0] > safety_x:
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
                                     drone.yaw = 8 - 1
-                            elif vector_distance[0] > safety_x:
+                            elif vector_distance[0] < -safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
@@ -198,12 +198,12 @@ def main():
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    drone.pitch = 8 + velocity
+                                    drone.pitch = 8 + 3
                             elif face_area > 16000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 8 - velocity
+                                    drone.pitch = 8 - 2
                             else:
                                 if do_you_have_drone:
                                     drone.pitch = 8
@@ -300,16 +300,16 @@ def main():
                             vector_target = np.array((int(center_of_bound_box[0]), int(center_of_bound_box[1])))
                             vector_distance = vector_true-vector_target
                             
-                            if vector_distance[0] < -safety_x_person:
+                            if vector_distance[0] > safety_x_person:
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    drone.yaw = 8 + 1
-                            elif vector_distance[0] > safety_x_person:
+                                    drone.yaw = 8 - 1
+                            elif vector_distance[0] < -safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    drone.yaw = 8 - 1
+                                    drone.yaw = 8 + 1
                             else:
                                 if do_you_have_drone:
                                     drone.yaw = 8
@@ -319,20 +319,20 @@ def main():
                                 control_disp += "t^ "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 9
+                                        drone.throttle = 10
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
                                 control_disp += "tV "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 7
+                                        drone.throttle = 6
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
                                         drone.throttle = 8
-                                pass
+                                #pass
                             
-                            if person_area < 60000:
+                            if person_area < 55000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
@@ -345,9 +345,10 @@ def main():
                             else:
                                 if do_you_have_drone:
                                     drone.pitch = 8
-                                pass
+                                #pass
                         
                             # Print center of bounding box and vector calculations
+                            print_out += str(confirmed_number) + " "
                             print_out += str(person_area)
                             cv2.circle(frame, (int(center_of_bound_box[0]), int(center_of_bound_box[1])), 5, (0,255,255), 2)
                         # Draw selected bounding box
