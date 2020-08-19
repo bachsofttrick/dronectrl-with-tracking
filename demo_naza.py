@@ -51,8 +51,8 @@ def main():
     total_pno = 0
 
     # Flag to choose which model to run
-    face_flag = False
-    yolosort = True
+    face_flag = True
+    yolosort = False
     
     # Flag to override autopilot
     auto_engaged = False
@@ -182,13 +182,13 @@ def main():
                                 control_disp += "t^ "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 9
+                                        drone.throttle = 10
                             elif vector_distance[1] < -safety_y:
                                 print("Fly down.")
                                 control_disp += "tV "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 7
+                                        drone.throttle = 6
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
