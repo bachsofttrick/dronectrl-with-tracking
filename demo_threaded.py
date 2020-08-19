@@ -169,12 +169,12 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 + velocity
+                                    drone.yaw = 128 + 30
                             elif vector_distance[0] < -safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 - velocity
+                                    drone.yaw = 128 - 30
                             else:
                                 if do_you_have_drone:
                                     drone.yaw = 128
@@ -200,12 +200,12 @@ def main():
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 + velocity
+                                    drone.pitch = 128 + 30
                             elif face_area > 16000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 - velocity - 5
+                                    drone.pitch = 128 - 35
                             else:
                                 if do_you_have_drone:
                                     drone.pitch = 128
@@ -306,12 +306,12 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 + velocity
+                                    drone.yaw = 128 + 30
                             elif vector_distance[0] < -safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 - velocity
+                                    drone.yaw = 128 - 30
                             else:
                                 if do_you_have_drone:
                                     drone.yaw = 128
@@ -420,44 +420,44 @@ def main():
             # Throttle
             if not auto_throttle and not auto_engaged:
                 if k == ord('w'):
-                    #drone.throttle_up()
+                    drone.throttle_up()
                     control_disp += "t^ "
-                    drone.incremt(0,0,velocity2,0)
+                    #drone.incremt(0,0,velocity2,0)
                 elif k == ord('s'):
-                    #drone.throttle_dwn()
+                    drone.throttle_dwn()
                     control_disp += "tV "
-                    drone.incremt(0,0,-velocity2,0)
+                    #drone.incremt(0,0,-velocity2,0)
             
             if not auto_engaged:
                 # Yaw
                 if k == ord('a'):
-                    #drone.yaw_left()
+                    drone.yaw_left()
                     control_disp += "y<- "
-                    drone.incremt(0,0,0,velocity2)
+                    #drone.incremt(0,0,0,velocity2)
                 elif k == ord('d'):
-                    #drone.yaw_right()
+                    drone.yaw_right()
                     control_disp += "y-> "
-                    drone.incremt(0,0,0,-velocity2)
+                    #drone.incremt(0,0,0,-velocity2)
 
                 # Pitch
                 if k == ord('i'):
-                    #drone.pitch_fwd()
+                    drone.pitch_fwd()
                     control_disp += "p^ "
-                    drone.incremt(0,velocity2,0,0)
+                    #drone.incremt(0,velocity2,0,0)
                 elif k == ord('k'):
-                    #drone.pitch_bwd()
+                    drone.pitch_bwd()
                     control_disp += "pV "
-                    drone.incremt(0,-velocity2,0,0)
+                    #drone.incremt(0,-velocity2,0,0)
 
                 # Roll
                 if k == ord('j'):
-                    #drone.roll_left()
+                    drone.roll_left()
                     control_disp += "r<- "
-                    drone.incremt(-velocity2,0,0,0)
+                    #drone.incremt(-velocity2,0,0,0)
                 elif k == ord('l'):
-                    #drone.roll_right()
+                    drone.roll_right()
                     control_disp += "r-> "
-                    drone.incremt(velocity2,0,0,0)
+                    #drone.incremt(velocity2,0,0,0)
                 
                 if k == ord('f'):
                     drone.incremt(0,0,0,0)

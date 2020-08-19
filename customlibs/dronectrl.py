@@ -87,43 +87,51 @@ class dm107s():
     
     # Roll right
     def roll_right(self):
-        if self.roll < 255:
-            self.roll += 127
+        self.roll += 20
+        if self.roll > 248:
+            self.roll = 248
     
     # Pitch forward
     def pitch_fwd(self):
-        if self.pitch < 255:
-            self.pitch += 127
+        self.pitch += 20
+        if self.pitch > 248:
+            self.pitch = 248
     
     # Increase throttle
     def throttle_up(self):
-        if self.throttle < 255:
-            self.throttle += 127
+        self.throttle += 20
+        if self.throttle > 248:
+            self.throttle = 248
     
     # Yaw right
     def yaw_right(self):
-        if self.yaw > 1:
-            self.yaw -= 127
+        self.yaw -= 20
+        if self.yaw < 18:
+            self.yaw = 18
     
     # Roll left
     def roll_left(self):
-        if self.roll > 1:
-            self.roll -= 127
+        self.roll -= 20
+        if self.roll < 18:
+            self.roll = 18
     
     # Pitch backward
     def pitch_bwd(self):
-        if self.pitch > 1:
-            self.pitch -= 127
+        self.pitch -= 20
+        if self.pitch < 18:
+            self.pitch = 18
     
     # Decrease throttle
     def throttle_dwn(self):
-        if self.throttle > 1:
-            self.throttle -= 127
+        self.throttle -= 20
+        if self.throttle < 18:
+            self.throttle = 18
     
     # Yaw left
     def yaw_left(self):
-        if self.yaw < 255:
-            self.yaw += 127
+        self.yaw += 20
+        if self.yaw > 248:
+            self.yaw = 248
     
     # Takeoff
     def takeoff(self):
@@ -179,8 +187,11 @@ class naza():
         self.pitch = 8
         self.throttle = 8
         self.yaw = 8
+        # Prevent multiple takeoff button presses
+        self._takeoff_flag = False
         # Prevent multiple ignite button presses
         self._ignite_flag = False
+        self._ignite_lock = False
         # Connect to UDP port
         self.sess = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
         self.ip = ip
@@ -188,6 +199,7 @@ class naza():
         #self.sess.connect((ip, port))
         # Initialize timer value
         self._ignite_timer = 0
+        self._takeoff_timer = 0
         # Flag to stop thread
         self._stopped = False
     
@@ -226,6 +238,7 @@ class naza():
         self.pitch = 8
         self.throttle = 8
         self.yaw = 8
+        self._takeoff_flag = False
         self._ignite_flag = False
     
     # Increment control
@@ -282,18 +295,37 @@ class naza():
     
     # Start engine
     def ignite(self):
-        self.roll = 0
-        self.pitch = 0
-        self.throttle = 0
-        self.yaw = 15
-        self._ignite_flag = True
-        self._ignite_timer = time()
+        if self._ignite_lock == False:
+            self.roll = 0
+            self.pitch = 0
+            self.throttle = 0
+            self.yaw = 15
+            self._ignite_flag = True
+            self._ignite_lock = True
+            self._ignite_timer = time()
+    
+    def reset_ign(self):
+        self._ignite_lock = False
+    
+    # Takeoff
+    def takeoff(self):
+        if self._takeoff_flag == False:
+            self.throttle = 10
+            self._takeoff_flag = True
+            self._takeoff_timer = time()
     
     # Flip takeoff flag
     def Flag_off(self):
-        if (self._ignite_flag == True and (time() - self._ignite_timer >= 1)):
+        if (self._ignite_flag == True and (time() - self._ignite_timer >= 2)):
             self._ignite_flag == False
-            self.default()
+            self.roll = 8
+            self.pitch = 8
+            self.yaw = 8
+            # After starting engine, takeoff right then
+            self.takeoff()
+        if (self._takeoff_flag == True and (time() - self._takeoff_timer >= 4)):
+            self.throttle = 8
+            self._takeoff_flag = False
 
 
     

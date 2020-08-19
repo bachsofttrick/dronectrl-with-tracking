@@ -231,9 +231,11 @@ def main():
             for track in tracker.tracks:
                 if not track.is_confirmed() or track.time_since_update > 1:
                     print(fno, track.track_id, 'not found.')
+                    face_flag = True
+                    yolosort = False
                     continue 
                 bbox = track.to_tlbr()
-                # Only track 1 person (WIP)
+                # Only track 1 person
                 if person_to_track:
                     if person_to_track[0] > bbox[0] and person_to_track[2] < bbox[2] and person_to_track[3] < bbox[3] and person_to_track[0] < bbox[2] and person_to_track[2] > bbox[0] and person_to_track[3] > bbox[1]:
                         print("Captured.")

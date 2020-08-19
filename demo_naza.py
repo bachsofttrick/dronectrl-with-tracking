@@ -411,10 +411,13 @@ def main():
             if k == ord('u'):
                 auto_throttle = not auto_throttle
             
-            # Takeoff and landing
-            if k == ord('t'):
-                #drone.ignite()
-                pass
+            # Takeoff
+            if k == ord('y'):
+                drone.ignite()
+                #pass
+            # Unlock ignition
+            if k == ord('b'):
+                drone.reset_ign()
 
             # Throttle
             if not auto_throttle and not auto_engaged:
