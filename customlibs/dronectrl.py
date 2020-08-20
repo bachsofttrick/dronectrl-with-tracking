@@ -222,7 +222,7 @@ class naza():
             self._package = self.get_hex().encode()
             #self.sess.send(self._package)
             self.sess.sendto(self._package, (self.ip, self.port))
-            #self.Flag_off()
+            self.Flag_off()
             sleep(0.05)
     
     # Close connection to drone
