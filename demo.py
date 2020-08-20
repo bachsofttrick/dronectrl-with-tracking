@@ -231,8 +231,10 @@ def main():
             for track in tracker.tracks:
                 if not track.is_confirmed() or track.time_since_update > 1:
                     print(fno, track.track_id, 'not found.')
-                    face_flag = True
-                    yolosort = False
+                    if auto_engaged and confirmed_number == track.track_id:
+                        # Swap back to face detection if person can't be found
+                        face_flag = True
+                        yolosort = False
                     continue 
                 bbox = track.to_tlbr()
                 # Only track 1 person
