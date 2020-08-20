@@ -326,6 +326,3 @@ class naza():
         if (self._takeoff_flag == True and (time() - self._takeoff_timer >= 4)):
             self.throttle = 8
             self._takeoff_flag = False
-
-
-    
