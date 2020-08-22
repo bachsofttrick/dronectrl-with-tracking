@@ -191,7 +191,7 @@ class naza():
         self._takeoff_flag = False
         # Prevent multiple ignite button presses
         self._ignite_flag = False
-        self._ignite_lock = False
+        self._ignite_send = False
         # Connect to UDP port
         self.sess = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
         self.ip = ip
@@ -219,7 +219,11 @@ class naza():
     # Send control to drone
     def send_ctrl(self):
         while not self._stopped:
-            self._package = self.get_hex().encode()
+            if self._ignite_send == True:
+                ignite_msg = 'st'
+                self._package = ignite_msg.encode()
+            else:
+                self._package = self.get_hex().encode()
             #self.sess.send(self._package)
             self.sess.sendto(self._package, (self.ip, self.port))
             self.Flag_off()
@@ -295,34 +299,31 @@ class naza():
     
     # Start engine
     def ignite(self):
-        if self._ignite_lock == False:
-            self.roll = 0
-            self.pitch = 0
-            self.throttle = 0
-            self.yaw = 15
+        if self._ignite_flag == False:
             self._ignite_flag = True
-            self._ignite_lock = True
+            self._ignite_send = True
             self._ignite_timer = time()
-    
-    def reset_ign(self):
-        self._ignite_lock = False
-    
+        
     # Takeoff
     def takeoff(self):
         if self._takeoff_flag == False:
-            self.throttle = 10
+            self.throttle = 12
             self._takeoff_flag = True
             self._takeoff_timer = time()
     
     # Flip takeoff flag
     def Flag_off(self):
-        if (self._ignite_flag == True and (time() - self._ignite_timer >= 2)):
-            self._ignite_flag == False
-            self.roll = 8
-            self.pitch = 8
-            self.yaw = 8
-            # After starting engine, takeoff right then
-            self.takeoff()
+        if self._ignite_flag == True:
+            if (time() - self._ignite_timer >= 1):
+                self._ignite_send = False
+                self.roll = 8
+                self.pitch = 8
+                self.yaw = 8
+                self.throttle = 8
+            # After starting engine, takeoff after 3s
+            if (time() - self._ignite_timer >= 4):
+                self._ignite_flag = False
+                self.takeoff()
         if (self._takeoff_flag == True and (time() - self._takeoff_timer >= 4)):
             self.throttle = 8
             self._takeoff_flag = False

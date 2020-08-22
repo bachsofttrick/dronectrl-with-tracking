@@ -200,19 +200,27 @@ void getFromSerial(){
   if (Serial.available() > 0) {
     incoming = Serial.readString();
     incoming.toCharArray(inctochar, 5);
-    for (int i=0; i < 4; i++) {
-      if (inctochar[i] >= 'a' & inctochar[i] <= 'f'){
-        tempvalue[i] = int(inctochar[i]) - 'a' + 10;
-      }
-      else if (inctochar[i] >= '0' & inctochar[i] <= '9') {
-        tempvalue[i] = int(inctochar[i]) - '0';
-      }
-      else tempvalue[i] = 8;
+    if (inctochar[0] == 's'){
+      throttle = 1100;
+      yaw = 1100;
+      pitch = 1100;
+      roll = 1900;
     }
-    throttle = tempvalue[0]*25 + 1300;
-    yaw = 1700 - tempvalue[1]*25;
-    pitch = tempvalue[2]*25 + 1300;
-    roll = 1700 - tempvalue[3]*25;
-    //read_signal();
+    else {
+      for (int i=0; i < 4; i++) {
+        if (inctochar[i] >= 'a' & inctochar[i] <= 'f'){
+          tempvalue[i] = int(inctochar[i]) - 'a' + 10;
+        }
+        else if (inctochar[i] >= '0' & inctochar[i] <= '9') {
+          tempvalue[i] = int(inctochar[i]) - '0';
+        }
+        else tempvalue[i] = 8;
+      }
+      throttle = tempvalue[0]*25 + 1300;
+      yaw = 1700 - tempvalue[1]*25;
+      pitch = tempvalue[2]*25 + 1300;
+      roll = 1700 - tempvalue[3]*25;
+    }
+    //read_signal(); 
   }
 }

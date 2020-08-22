@@ -335,7 +335,7 @@ def main():
                                         drone.throttle = 8
                                 #pass
                             
-                            if person_area < 55000:
+                            if person_area < 60000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
@@ -418,9 +418,6 @@ def main():
             if k == ord('y'):
                 drone.ignite()
                 #pass
-            # Unlock ignition
-            if k == ord('b'):
-                drone.reset_ign()
 
             # Throttle
             if not auto_throttle and not auto_engaged:
