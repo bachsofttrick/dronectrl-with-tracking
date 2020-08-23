@@ -314,13 +314,22 @@ class naza():
     # Flip takeoff flag
     def Flag_off(self):
         if self._ignite_flag == True:
-            if (time() - self._ignite_timer >= 1):
+            if (time() - self._ignite_timer >= 1) and (time() - self._ignite_timer < 1.5):
                 self._ignite_send = False
                 self.roll = 8
                 self.pitch = 8
                 self.yaw = 8
+                self.throttle = 0
+            # Warming up engine
+            if (time() - self._ignite_timer >= 1.5) and (time() - self._ignite_timer < 2):
+                self.throttle = 2
+            if (time() - self._ignite_timer >= 2) and (time() - self._ignite_timer < 2.5):
+                self.throttle = 4
+            if (time() - self._ignite_timer >= 2.5) and (time() - self._ignite_timer < 3):
+                self.throttle = 6
+            if (time() - self._ignite_timer >= 3) and (time() - self._ignite_timer < 4):
                 self.throttle = 8
-            # After starting engine, takeoff after 3s
+            # After starting engine, takeoff after 4s
             if (time() - self._ignite_timer >= 4):
                 self._ignite_flag = False
                 self.takeoff()
