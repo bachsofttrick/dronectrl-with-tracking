@@ -93,7 +93,7 @@ def main():
         h = 720
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         localtime = strftime("m%md%d-%H%M%S")
-        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 15, (w, h))
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 30, (w, h))
         frame_index = -1 
 
     fps = 0.0
