@@ -26,7 +26,7 @@ from customlibs.mobilenet_lib import Mobilenetdnn
 
 def main():
     # Open YOLO
-    yolo = YOLO('tiny')
+    yolo = YOLO('full')
 
     # Open MobileNet SSD
     #model_mnet = Mobilenetdnn()
@@ -215,7 +215,7 @@ def main():
                             cv2.rectangle(frame, (resize_div_2[0] - safety_x, resize_div_2[1] - safety_y), (resize_div_2[0] + safety_x, resize_div_2[1] + safety_y), (0,255,255), 2)
                             
                             # Transfer face to person tracking
-                            if total_pno >= 30 and (pno / total_pno) >= 0.5:
+                            if total_pno >= 20 and (pno / total_pno) >= 0.5:
                                 person_to_track = face_bbox[i][0:4]
                                 if do_you_have_drone:
                                     drone.default()
@@ -242,7 +242,7 @@ def main():
                 if not person_found:
                     if pno > 0:
                         total_pno += 1
-                    if total_pno >= 30 and (pno / total_pno) < 0.5:
+                    if total_pno >= 20 and (pno / total_pno) < 0.5:
                         pno = 0
                         total_pno = 0
             
