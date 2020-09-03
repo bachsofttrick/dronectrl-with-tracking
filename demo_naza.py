@@ -42,6 +42,10 @@ def main():
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
 
+    # File text to log
+    face_text = open('face.txt', 'w')
+    person_text = open('person.txt', 'w')
+
     # Facenet-based face recognizer
     person_to_follow = 'bach'
     face_dettect = Recognizer('resnet10')
@@ -67,14 +71,14 @@ def main():
     confirmed_string = ""
         
     # Open stream
-    video_capture = VideoGet("rtsp://192.168.4.103:8554/test").start()
+    video_capture = VideoGet("rtsp://192.168.4.102:8554/test").start()
     
     # Enter drone and control speed
     do_you_have_drone = True
     velocity = 1
     velocity2 = 2
     if do_you_have_drone:
-        drone = naza('192.168.4.103', 5005).start()
+        drone = naza('192.168.4.102', 5005).start()
     
     # Enter safety zone coordinate
     # For face tracking
@@ -146,7 +150,7 @@ def main():
                         drone.yaw = 8
                         drone.pitch = 8
                         if auto_throttle:
-                            drone.throttle = 8
+                            drone.throttle = 9
                 else:
                     for i in range(len(face_bbox)):
                         face_name = face_bbox[i][4]
@@ -192,7 +196,7 @@ def main():
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 8
+                                        drone.throttle = 9
                             
                             if face_area < 9000:
                                 print("Push forward")
@@ -273,7 +277,7 @@ def main():
                             drone.yaw = 8
                             drone.pitch = 8
                             if auto_throttle:
-                                drone.throttle = 8
+                                drone.throttle = 9
                         # Swap back to face detection if person can't be found
                         face_flag = True
                         yolosort = False
@@ -332,7 +336,7 @@ def main():
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 8
+                                        drone.throttle = 9
                                 #pass
                             
                             if person_area < 60000:
@@ -478,6 +482,10 @@ def main():
             frame_index = frame_index + 1
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
+        if face_flag:
+            face_text.write(str(fps) + "\n")
+        if yolosort:
+            person_text.write(str(fps) + "\n")
         print("fps= %f"%(fps))
         print("bach= %d/%d, person_found= %d" % (pno, total_pno, person_found))
         
@@ -488,6 +496,8 @@ def main():
     if writeVideo_flag:
         out.release()
     cv2.destroyAllWindows()
+    face_text.close()
+    person_text.close()
 
 if __name__ == '__main__':
     main()
