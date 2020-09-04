@@ -79,6 +79,7 @@ class Recognizer:
                                             interpolation=cv2.INTER_CUBIC)
                         #cv2.imshow('face', scaled)
                         scaled = facenet.prewhiten(scaled)
+                        #cv2.imshow('face', scaled)
                         scaled_reshape = scaled.reshape(-1, self.INPUT_IMAGE_SIZE, self.INPUT_IMAGE_SIZE, 3)
                         feed_dict = {self.images_placeholder: scaled_reshape, self.phase_train_placeholder: False}
                         emb_array = self.sess.run(self.embeddings, feed_dict=feed_dict)

@@ -21,12 +21,12 @@ warnings.filterwarnings('ignore')
 # Custom import lib
 from customlibs.face_recog_lib import Recognizer
 from customlibs.VideoGet import VideoGet
-from customlibs.dronectrl import dm107s
+from customlibs.dronectrl import dm107s, naza
 from customlibs.mobilenet_lib import Mobilenetdnn
 
 def main():
     # Open YOLO
-    yolo = YOLO('tiny')
+    yolo = YOLO('full')
 
     # Open MobileNet SSD
     #model_mnet = Mobilenetdnn()
@@ -41,6 +41,10 @@ def main():
     encoder = gdet.create_box_encoder(model_filename,batch_size=1)
     metric = nn_matching.NearestNeighborDistanceMetric("cosine", max_cosine_distance, nn_budget)
     tracker = Tracker(metric)
+
+    # File text to log
+    face_text = open('face.txt', 'w')
+    person_text = open('person.txt', 'w')
 
     # Facenet-based face recognizer
     person_to_follow = 'bach'
@@ -67,16 +71,14 @@ def main():
     confirmed_string = ""
         
     # Open stream
-    video_capture = VideoGet("rtsp://192.168.100.1/encavc0-stream").start()
-    #video_capture = VideoGet("http://192.168.43.111:8080/video").start()
-    #video_capture = VideoGet("rtsp://192.168.4.102:8554/test").start()
+    video_capture = VideoGet("rtsp://192.168.4.102:8554/test").start()
     
     # Enter drone and control speed
     do_you_have_drone = True
-    velocity = 30
-    velocity2 = 120
+    velocity = 1
+    velocity2 = 2
     if do_you_have_drone:
-        drone = dm107s().start()
+        drone = naza('192.168.4.102', 5005).start()
     
     # Enter safety zone coordinate
     # For face tracking
@@ -93,7 +95,7 @@ def main():
         h = 720
         fourcc = cv2.VideoWriter_fourcc(*'MJPG')
         localtime = strftime("m%md%d-%H%M%S")
-        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 30, (w, h))
+        out = cv2.VideoWriter('output %s.avi' % localtime, fourcc, 15, (w, h))
         frame_index = -1 
 
     fps = 0.0
@@ -116,7 +118,7 @@ def main():
         # Resize frame
         resize_to = (1280, 720)
         resize_div_2 = (int(resize_to[0]/2), int(resize_to[1]/2))
-        #frame = cv2.resize(frame, resize_to)
+        frame = cv2.resize(frame, resize_to)
 
         # Show control on the right corner of frame
         control_disp = "" 
@@ -145,10 +147,10 @@ def main():
             # Prevent autopilot when there is no face detected
                 if len(face_bbox) == 0:
                     if do_you_have_drone:
-                        drone.yaw = 128
-                        drone.pitch = 128
+                        drone.yaw = 8
+                        drone.pitch = 8
                         if auto_throttle:
-                            drone.throttle = 128
+                            drone.throttle = 9
                 else:
                     for i in range(len(face_bbox)):
                         face_name = face_bbox[i][4]
@@ -169,46 +171,46 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 - 30
+                                    drone.yaw = 8 - 1
                             elif vector_distance[0] < -safety_x:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 + 30
+                                    drone.yaw = 8 + 1
                             else:
                                 if do_you_have_drone:
-                                    drone.yaw = 128
+                                    drone.yaw = 8
                             
                             if vector_distance[1] > safety_y:
                                 print("Fly up.")
                                 control_disp += "t^ "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 128 + 20
+                                        drone.throttle = 10
                             elif vector_distance[1] < -safety_y:
                                 print("Fly down.")
                                 control_disp += "tV "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 128 - 80
+                                        drone.throttle = 6
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 128
+                                        drone.throttle = 9
                             
                             if face_area < 9000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 + 100
+                                    drone.pitch = 8 + 3
                             elif face_area > 16000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 - 7
+                                    drone.pitch = 8 - 2
                             else:
                                 if do_you_have_drone:
-                                    drone.pitch = 128
+                                    drone.pitch = 8
                             
                             # Print center of bounding box and vector calculations
                             print_out += str(face_area)
@@ -272,10 +274,10 @@ def main():
                 if not track.is_confirmed() or track.time_since_update > 1:
                     if auto_engaged and confirmed_number == track.track_id:
                         if do_you_have_drone:
-                            drone.yaw = 128
-                            drone.pitch = 128
+                            drone.yaw = 8
+                            drone.pitch = 8
                             if auto_throttle:
-                                drone.throttle = 128
+                                drone.throttle = 9
                         # Swap back to face detection if person can't be found
                         face_flag = True
                         yolosort = False
@@ -309,48 +311,48 @@ def main():
                                 print("Yaw left.")
                                 control_disp += "y<- "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 - 30
+                                    drone.yaw = 8 - 1
                             elif vector_distance[0] < -safety_x_person:
                                 print("Yaw right.")
                                 control_disp += "y-> "
                                 if do_you_have_drone:
-                                    drone.yaw = 128 + 30
+                                    drone.yaw = 8 + 1
                             else:
                                 if do_you_have_drone:
-                                    drone.yaw = 128
+                                    drone.yaw = 8
                             
                             if vector_distance[1] > safety_y_person:
                                 print("Fly up.")
                                 control_disp += "t^ "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 128 + 20
+                                        drone.throttle = 10
                             elif vector_distance[1] < -safety_y_person:
                                 print("Fly down.")
                                 control_disp += "tV "
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 128 - 80
+                                        drone.throttle = 6
                             else:
                                 if do_you_have_drone:
                                     if auto_throttle:
-                                        drone.throttle = 128
-                                pass
+                                        drone.throttle = 9
+                                #pass
                             
-                            if person_area < 45000:
+                            if person_area < 60000:
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 + 100
-                            elif person_area > 80000:
+                                    drone.pitch = 8 + 3
+                            elif person_area > 90000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 - 7
+                                    drone.pitch = 8 - 2
                             else:
                                 if do_you_have_drone:
-                                    drone.pitch = 128
-                                pass
+                                    drone.pitch = 8
+                                #pass
                         
                             # Print center of bounding box and vector calculations
                             print_out += str(confirmed_number) + " "
@@ -416,31 +418,32 @@ def main():
             if k == ord('u'):
                 auto_throttle = not auto_throttle
             
-            # Takeoff and landing
-            if k == ord('t'):
-                drone.takeoff()
+            # Takeoff
+            if k == ord('y'):
+                drone.ignite()
+                #pass
 
             # Throttle
             if not auto_throttle and not auto_engaged:
                 if k == ord('w'):
                     drone.throttle_up()
                     control_disp += "t^ "
-                    #drone.incremt(0,0,velocity2,0)
+                    #drone.incremt(0,0,1,0)
                 elif k == ord('s'):
                     drone.throttle_dwn()
                     control_disp += "tV "
-                    #drone.incremt(0,0,-velocity2,0)
+                    #drone.incremt(0,0,-1,0)
             
-            if not auto_engaged:
+            if not auto_engaged: 
                 # Yaw
                 if k == ord('a'):
                     drone.yaw_left()
                     control_disp += "y<- "
-                    #drone.incremt(0,0,0,velocity2)
+                    #drone.incremt(0,0,0,-velocity2)
                 elif k == ord('d'):
                     drone.yaw_right()
                     control_disp += "y-> "
-                    #drone.incremt(0,0,0,-velocity2)
+                    #drone.incremt(0,0,0,velocity2)
 
                 # Pitch
                 if k == ord('i'):
@@ -465,16 +468,6 @@ def main():
                 if k == ord('f'):
                     drone.incremt(0,0,0,0)
 
-            # STOP NOW
-            if k == ord('e'):
-                control_disp = "STOP!"
-                drone.emergency_stop()
-            
-            # Calibrate gyro
-            if k == ord('v'):
-                control_disp = "Calibrate..."
-                drone.calib_gyro()
-        
         # Show model in use on frame
         cv2.putText(frame, model_in_use,(0, 20),0, 0.8, (255,0,0),2)
         # Draw drone control
@@ -489,6 +482,10 @@ def main():
             frame_index = frame_index + 1
             
         fps  = ( fps + (1./(time.time()-t1)) ) / 2
+        if face_flag:
+            face_text.write(str(fps) + "\n")
+        if yolosort:
+            person_text.write(str(fps) + "\n")
         print("fps= %f"%(fps))
         print("bach= %d/%d, person_found= %d" % (pno, total_pno, person_found))
         
@@ -499,6 +496,8 @@ def main():
     if writeVideo_flag:
         out.release()
     cv2.destroyAllWindows()
+    face_text.close()
+    person_text.close()
 
 if __name__ == '__main__':
     main()

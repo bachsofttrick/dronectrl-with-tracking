@@ -9,5 +9,6 @@
 *.pbtxt
 *.pyc
 *.avi
+*.m4v
 *.caffemodel
 *.prototxt
