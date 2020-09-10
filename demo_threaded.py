@@ -57,7 +57,7 @@ def main():
     # Flag to override autopilot
     auto_engaged = False
     # This is for controlling altitude manually
-    auto_throttle = True
+    auto_throttle = False
     
     # Transfer to person tracking
     person_to_track = None
@@ -205,7 +205,7 @@ def main():
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 - 7
+                                    drone.pitch = 128 - 10
                             else:
                                 if do_you_have_drone:
                                     drone.pitch = 128
@@ -346,7 +346,7 @@ def main():
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 - 7
+                                    drone.pitch = 128 - 10
                             else:
                                 if do_you_have_drone:
                                     drone.pitch = 128
@@ -407,6 +407,7 @@ def main():
         # Override autopilot
         if k == ord('o'):
             auto_engaged = not auto_engaged
+            auto_throttle = not auto_throttle
             if do_you_have_drone:
                 drone.default()
         
