@@ -13,3 +13,36 @@ It is built from the ground up with a custom drone and controlled using RX701 re
 * Main unit: Raspberry Pi 3 Model B+
 * Camera: Raspberry Pi Camera V2 - 8MP
 * Control unit: Arduino Uno R3
+
+## Getting started
+1. Create 2 folders "dataset" and "raw" inside of "dataset". In "raw", create any number of folders based on how many people needed to be recognized by the drone. Also, create "unknown" folder for random faces that doesn't belong to any one of the faces in dataset.
+
+2. Create a dataset with only 160x160 faces.
+'''
+python align_dataset_mtcnn.py dataset/raw dataset/processed --image_size 160 --random_order --gpu_memory_fraction 0.6
+'''
+gpu_memory_fraction 0.6 is needed to avoid overloading GPU VRAM.
+
+3. Train the network
+'''
+python classifier.py TRAIN dataset/processed Models/20180402-114759.pb models/facemodel.pkl --batch_size 1000
+'''
+
+4. Use 1 of 3 files to run program:
+* demo.py is for example with pre-existing video files
+* demo_threaded.py is for DM107s drone
+* demo_naza.py is for NAZA-M Lite drone
+
+5. At this line, it can be either "tiny" or "full" for 2 version of YOLOv3 as person detector.
+'''
+yolo = YOLO('tiny')
+'''
+This line has 3 options: "mtcnn" for MTCNN, "yolov2" for YOLOv2-tiny, "resnet10" for SSD ResNet10 as face detector.
+'''
+face_dettect = Recognizer('resnet10')
+'''
+
+6. Choose person to detect face and follow.
+'''
+person_to_follow = 'bach'
+'''
