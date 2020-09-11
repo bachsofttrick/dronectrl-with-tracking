@@ -4,8 +4,8 @@ This project offer a solution for object detection and monitoring through unmann
 It is built from the ground up with a custom drone and controlled using RX701 remote control or automatic controller.
 
 ## DM107s Specifications:
-Brand: DA MING
-Item Name:  Foldable Drone
+*Brand: DA MING
+*Item Name:  Foldable Drone
 Item No.: DM107S
 Frequency: 2.4 GHz
 Channels: 4
