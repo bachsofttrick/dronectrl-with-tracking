@@ -4,20 +4,20 @@ This project offer a solution for object detection and monitoring through unmann
 It is built from the ground up with a custom drone and controlled using RX701 remote control or automatic controller.
 
 ## DM107s Specifications:
-*Brand: DA MING
-*Item Name:  Foldable Drone
-Item No.: DM107S
-Frequency: 2.4 GHz
-Channels: 4
-Gyro: 6 Axis
-Product Battery: 3.7V 1000mAh (Included)
-Charging Time: About 80-100mins
-Flying Time: About 8-10mins
-Transmitter Battery: 1.5V AA X 2 (Not Included)
-R/C Distance: 80-100m
-WIFI Distance: 50-80m
-Color: Black
-Camera: 2MP Wide-angle
+* Brand: DA MING
+* Item Name:  Foldable Drone
+* Item No.: DM107S
+* Frequency: 2.4 GHz
+* Channels: 4
+* Gyro: 6 Axis
+* Product Battery: 3.7V 1000mAh (Included)
+* Charging Time: About 80-100mins
+* Flying Time: About 8-10mins
+* Transmitter Battery: 1.5V AA X 2 (Not Included)
+* R/C Distance: 80-100m
+* WIFI Distance: 50-80m
+* Color: Black
+* Camera: 2MP Wide-angle
 
 ## Naza Drone Specifications:
 * Frame: Tarot Iron man 650
