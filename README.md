@@ -46,3 +46,21 @@ face_dettect = Recognizer('resnet10')
 ```
 person_to_follow = 'bach'
 ```
+
+7. When in program GUI, use the following keys:
+* w/s is for throttle up/down
+* a/d is for yaw left/right
+* i/k is for pitch forward/backward
+* j/l is for roll left/right
+* r is for changing between face recognition and person tracking (not available on demo.py)
+* t is for auto takeoff (changing between face recognition and person tracking on demo.py)
+* u is for auto-throttle (algorithm takes cantrol of altitude)
+* o is for autopilot (if auto-throttle is disabled, only yaw and pitch are taken over)
+* q is for exit
+* e is for emergency shutdown (only available on demo_threaded.py)
+* v is for gyroscope calibration (only available on demo_threaded.py)
+
+8. In normal operation, the program detects face first, then after a face is recognized, the program will switch to person tracking. However, if you are in these senarios:
+* use "r" to change mode
+* want to cancel current person being tracked
+then press "c" to cancel the person's id being tracked. After that, press "o" to disable autopilot. Type your preferred ID to track and press Enter.
