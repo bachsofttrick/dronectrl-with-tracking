@@ -3,13 +3,29 @@
 This project offer a solution for object detection and monitoring through unmanned aerial vehicle, specifically a drone. The drone will search, identify and follow a designated object. It can also transmit images directly to a computer, smartphone or any devices which supports RTSP protocol. It allows the observer to monitor, control, and at the same time, it can learn and remember the object temporarily so that whenever they meet, the drone can be ready to follow this object autonomously.
 It is built from the ground up with a custom drone and controlled using RX701 remote control or automatic controller.
 
-## Drone specifications:
+## DM107s Specifications:
+Brand: DA MING
+Item Name:  Foldable Drone
+Item No.: DM107S
+Frequency: 2.4 GHz
+Channels: 4
+Gyro: 6 Axis
+Product Battery: 3.7V 1000mAh (Included)
+Charging Time: About 80-100mins
+Flying Time: About 8-10mins
+Transmitter Battery: 1.5V AA X 2 (Not Included)
+R/C Distance: 80-100m
+WIFI Distance: 50-80m
+Color: Black
+Camera: 2MP Wide-angle
+
+## Naza Drone Specifications:
 * Frame: Tarot Iron man 650
 * Flight controller: NAZA-M Lite
 * Engine: 4x980 KV
 * Remote control: RX701 + Devo 7
 
-## Automatic controller specifications:
+## Automatic Controller Specifications:
 * Main unit: Raspberry Pi 3 Model B+
 * Camera: Raspberry Pi Camera V2 - 8MP
 * Control unit: Arduino Uno R3
