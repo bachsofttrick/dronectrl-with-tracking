@@ -62,5 +62,6 @@ person_to_follow = 'bach'
 
 8. In normal operation, the program detects face first, then after a face is recognized, the program will switch to person tracking. However, if you are in these senarios:
 * use "r" to change mode
-* want to cancel current person being tracked\n
+* want to cancel current person being tracked
+
 then press "c" to cancel the person's id being tracked. After that, press "o" to disable autopilot. Type your preferred ID to track and press Enter.
