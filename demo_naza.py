@@ -61,7 +61,7 @@ def main():
     # Flag to override autopilot
     auto_engaged = False
     # This is for controlling altitude manually
-    auto_throttle = True
+    auto_throttle = False
     
     # Transfer to person tracking
     person_to_track = None
@@ -409,6 +409,7 @@ def main():
         # Override autopilot
         if k == ord('o'):
             auto_engaged = not auto_engaged
+            auto_throttle = not auto_throttle
             if do_you_have_drone:
                 drone.default()
         
