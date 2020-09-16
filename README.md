@@ -32,6 +32,7 @@ It is built from the ground up with a custom drone and controlled using RX701 re
 
 ## Requirements:
 OpenCV with GStreamer and FFMPEG enabled.
+
 Also follow requirement.txt.
 
 ## Getting started
