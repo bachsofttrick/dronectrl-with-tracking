@@ -30,6 +30,9 @@ It is built from the ground up with a custom drone and controlled using RX701 re
 * Color: Black
 * Camera: 2MP Wide-angle
 
+## Requirements:
+OpenCV with GStreamer and FFMPEG enabled.
+
 ## Getting started
 1. Create 2 folders "dataset" and "raw" inside of "dataset". In "raw", create any number of folders based on how many people needed to be recognized by the drone. Also, create "unknown" folder for random faces that doesn't belong to any one of the faces in dataset.
 
