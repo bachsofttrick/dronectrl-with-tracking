@@ -200,12 +200,12 @@ def main():
                                 print("Push forward")
                                 control_disp += "p^ "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 + 100
+                                    drone.pitch = 128 + 75
                             elif face_area > 16000:
                                 print("Pull back")
                                 control_disp += "pV "
                                 if do_you_have_drone:
-                                    drone.pitch = 128 - 10
+                                    drone.pitch = 128 - 30
                             else:
                                 if do_you_have_drone:
                                     drone.pitch = 128
