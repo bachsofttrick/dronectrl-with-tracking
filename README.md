@@ -3,6 +3,9 @@
 This project offer a solution for object detection and monitoring through unmanned aerial vehicle, specifically a drone. The drone will search, identify and follow a designated object. It can also transmit images directly to a computer, smartphone or any devices which supports RTSP protocol. It allows the observer to monitor, control, and at the same time, it can learn and remember the object temporarily so that whenever they meet, the drone can be ready to follow this object autonomously.
 It is built from the ground up with a custom drone and controlled using RX701 remote control or automatic controller.
 
+* [Paper](https://github.com/bachsofttrick/dronectrl-with-tracking/blob/master/paper.pdf)
+* [Thesis](https://github.com/bachsofttrick/dronectrl-with-tracking/blob/master/thesis.pdf)
+
 ## Naza Drone Specifications:
 * Frame: Tarot Iron man 650
 * Flight controller: NAZA-M Lite
